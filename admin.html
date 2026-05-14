@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Panel - Gudang Distribusi</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f8fafc; color: #0f172a; line-height: 1.5; padding: 24px; min-height: 100vh; }
+  .container { max-width: 1200px; margin: 0 auto; }
+  .header { background: linear-gradient(135deg, #1e293b 0%, #334155 100%); padding: 18px 24px; border-radius: 14px; margin-bottom: 18px; color: white; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
+  .brand { display: flex; align-items: center; gap: 12px; }
+  .logo { width: 40px; height: 40px; background: linear-gradient(135deg, #ef4444, #f97316); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 800; }
+  .title { font-size: 17px; font-weight: 700; }
+  .sub { font-size: 12px; color: #cbd5e1; }
+  .right-info { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .user-box { text-align: right; font-size: 12px; color: #cbd5e1; }
+  .user-box strong { display: block; font-size: 14px; color: white; }
+  .user-box a { color: #fbbf24; font-size: 11px; cursor: pointer; }
+  .nav-btn { background: white; color: #1e293b; padding: 8px 14px; border-radius: 8px; text-decoration: none; font-size: 13px; font-weight: 600; }
+  .tabs { display: flex; gap: 6px; margin-bottom: 18px; flex-wrap: wrap; }
+  .tab-btn { padding: 10px 18px; font-size: 13px; border: 1px solid #e2e8f0; background: white; border-radius: 8px; cursor: pointer; color: #64748b; font-weight: 600; font-family: inherit; }
+  .tab-btn.active { background: #1e293b; color: white; border-color: #1e293b; }
+  .tab-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .pane { display: none; }
+  .pane.active { display: block; }
+  .card { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); margin-bottom: 16px; }
+  .ch { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; padding-bottom: 14px; border-bottom: 1px solid #e2e8f0; }
+  .ch-t { font-size: 16px; font-weight: 700; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr auto; gap: 12px; align-items: flex-end; margin-bottom: 16px; }
+  @media (max-width: 600px) { .form-row { grid-template-columns: 1fr !important; } }
+  label { display: block; font-size: 11px; color: #475569; margin-bottom: 6px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+  input, select { width: 100%; padding: 12px 14px; border: 1px solid #cbd5e1; border-radius: 8px; font-family: inherit; font-size: 14px; background: white; }
+  input:focus, select:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
+  .btn { background: #1e293b; color: white; padding: 12px 24px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; font-family: inherit; font-size: 14px; white-space: nowrap; }
+  .btn:hover:not(:disabled) { background: #0f172a; }
+  .btn:disabled { background: #cbd5e1; cursor: not-allowed; }
+  .btn-danger { background: #ef4444; }
+  .btn-danger:hover:not(:disabled) { background: #dc2626; }
+  .btn-sm { padding: 6px 12px; font-size: 12px; margin-left: 4px; }
+  .btn-outline { background: white; color: #1e293b; border: 1px solid #cbd5e1; padding: 10px 18px; border-radius: 8px; cursor: pointer; font-family: inherit; font-size: 13px; font-weight: 600; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { text-align: left; padding: 10px 8px; font-weight: 700; color: #64748b; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; background: #f8fafc; }
+  td { padding: 14px 8px; border-bottom: 1px solid #f1f5f9; }
+  .right { text-align: right; }
+  .empty { text-align: center; padding: 40px 0; color: #94a3b8; font-style: italic; }
+  .staff-ini { width: 32px; height: 32px; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; color: white; vertical-align: middle; margin-right: 8px; }
+  .pin-display { font-family: 'Courier New', monospace; background: #f1f5f9; padding: 4px 10px; border-radius: 4px; font-weight: 700; letter-spacing: 2px; }
+  .role-badge { font-size: 10px; padding: 3px 8px; border-radius: 4px; font-weight: 800; letter-spacing: 0.5px; }
+  .role-owner { background: #fbbf24; color: white; }
+  .role-supervisor { background: #3b82f6; color: white; }
+  .login-bg { min-height: calc(100vh - 48px); display: flex; align-items: center; justify-content: center; }
+  .login-card { max-width: 420px; width: 100%; background: white; border-radius: 16px; padding: 36px 32px; box-shadow: 0 10px 40px rgba(0,0,0,0.08); text-align: center; }
+  .login-logo { width: 56px; height: 56px; background: linear-gradient(135deg, #ef4444, #f97316); border-radius: 14px; margin: 0 auto 16px; display: flex; align-items: center; justify-content: center; font-size: 26px; font-weight: 800; color: white; }
+  .login-title { font-size: 22px; font-weight: 800; margin-bottom: 6px; }
+  .login-sub { font-size: 13px; color: #64748b; margin-bottom: 24px; }
+  .login-form input { margin-bottom: 12px; text-align: left; }
+  .login-form label { text-align: left; }
+  .err-msg { color: #ef4444; font-size: 12px; margin-top: 8px; }
+  .toast { position: fixed; bottom: 30px; right: 30px; background: #10b981; color: white; padding: 14px 22px; border-radius: 8px; font-size: 14px; font-weight: 600; opacity: 0; transform: translateY(20px); transition: all 0.3s; pointer-events: none; z-index: 200; box-shadow: 0 8px 24px rgba(0,0,0,0.2); }
+  .toast.show { opacity: 1; transform: translateY(0); }
+  .toast.err { background: #ef4444; }
+  .info-box { background: #dbeafe; border-left: 4px solid #3b82f6; padding: 12px 16px; border-radius: 8px; font-size: 13px; color: #1e40af; margin-bottom: 16px; }
+  .warning-box { background: #fef3c7; border-left: 4px solid #f59e0b; padding: 12px 16px; border-radius: 8px; font-size: 13px; color: #92400e; margin-bottom: 16px; }
+  .config-warning { background: #fee2e2; border: 1px solid #ef4444; color: #991b1b; padding: 16px 20px; border-radius: 12px; margin-bottom: 16px; font-size: 13px; }
+  .modal-bg { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 100; padding: 20px; }
+  .modal-bg.show { display: flex; }
+  .modal { background: white; border-radius: 12px; padding: 24px; max-width: 420px; width: 100%; }
+  .modal h3 { margin-bottom: 8px; font-size: 18px; }
+  .modal p { font-size: 13px; color: #64748b; margin-bottom: 16px; }
+  .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px; }
+  .confirm-modal h3 { color: #ef4444; }
+</style>
+</head>
+<body>
+
+<div id="login-view" class="container login-bg">
+  <div class="login-card">
+    <div class="login-logo">⚙</div>
+    <div class="login-title">Admin Panel</div>
+    <div class="login-sub">Khusus owner & supervisor</div>
+    <div id="config-warning-login"></div>
+    <div class="login-form">
+      <label>Username</label>
+      <input type="text" id="admin-user" placeholder="username" autofocus autocomplete="username">
+      <label>Password</label>
+      <input type="password" id="admin-pass" placeholder="password" autocomplete="current-password">
+      <div class="err-msg" id="login-err" style="display:none;">Username atau password salah</div>
+      <button class="btn" id="btn-login" style="width:100%; margin-top:12px;" onclick="doAdminLogin()">Masuk</button>
+    </div>
+    <div style="margin-top:20px; font-size:11px; color:#94a3b8;">
+      Belum ada admin? <a href="#" onclick="firstSetup(); return false;" style="color:#3b82f6;">Setup admin pertama</a>
+    </div>
+  </div>
+</div>
+
+<div id="app-view" class="container" style="display: none;">
+<div class="header">
+  <div class="brand">
+    <div class="logo">⚙</div>
+    <div><div class="title">Admin Panel</div><div class="sub" id="header-time">Memuat...</div></div>
+  </div>
+  <div class="right-info">
+    <div class="user-box">Login sebagai<strong id="user-name">-</strong><a href="#" onclick="logout(); return false;">Keluar</a></div>
+    <a href="index.html" class="nav-btn">📊 Dashboard</a>
+  </div>
+</div>
+
+<div id="config-warning"></div>
+
+<div class="tabs">
+  <button class="tab-btn active" data-tab="staff">👥 Kelola Karyawan</button>
+  <button class="tab-btn" data-tab="admins">🔐 Kelola Admin</button>
+</div>
+
+<div class="pane active" id="pane-staff">
+  <div class="card">
+    <div class="ch"><div class="ch-t">Tambah Karyawan Baru</div></div>
+    <div class="info-box">💡 PIN 4-6 angka. Tiap karyawan harus punya PIN berbeda.</div>
+    <div class="form-row">
+      <div><label>Nama Karyawan</label><input type="text" id="staff-name" placeholder="Budi Santoso" maxlength="50"></div>
+      <div><label>PIN (4-6 angka)</label><input type="text" id="staff-pin" placeholder="1234" maxlength="6" inputmode="numeric" autocomplete="off"></div>
+      <button class="btn" id="btn-add-staff" onclick="addStaff()">+ Tambah</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="ch"><div class="ch-t">Daftar Karyawan</div><div style="font-size:12px; color:#64748b;" id="staff-count">Memuat...</div></div>
+    <table>
+      <thead><tr><th>Nama</th><th>PIN</th><th class="right">Aksi</th></tr></thead>
+      <tbody id="tbl-staff"><tr><td colspan="3" class="empty">Memuat...</td></tr></tbody>
+    </table>
+  </div>
+</div>
+
+<div class="pane" id="pane-admins">
+  <div class="card">
+    <div class="ch"><div class="ch-t">Tambah Admin Baru</div></div>
+    <div class="warning-box">⚠️ <strong>Owner</strong> akses penuh. <strong>Supervisor</strong> hanya kelola karyawan.</div>
+    <div class="form-row" style="grid-template-columns: 1fr 1fr 1fr auto;">
+      <div><label>Username</label><input type="text" id="adm-user" placeholder="username" maxlength="30"></div>
+      <div><label>Password</label><input type="password" id="adm-pass" placeholder="min 6 karakter" maxlength="50" autocomplete="new-password"></div>
+      <div><label>Role</label><select id="adm-role"><option value="supervisor">Supervisor</option><option value="owner">Owner</option></select></div>
+      <button class="btn" id="btn-add-admin" onclick="addAdmin()">+ Tambah</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="ch"><div class="ch-t">Daftar Admin</div><div style="font-size:12px; color:#64748b;" id="admin-count">Memuat...</div></div>
+    <table>
+      <thead><tr><th>Username</th><th>Role</th><th class="right">Aksi</th></tr></thead>
+      <tbody id="tbl-admin"><tr><td colspan="3" class="empty">Memuat...</td></tr></tbody>
+    </table>
+  </div>
+</div>
+</div>
+
+<div class="modal-bg" id="modal-edit">
+  <div class="modal">
+    <h3 id="modal-title">Edit</h3>
+    <p id="modal-desc">.</p>
+    <label id="modal-label">Nilai baru</label>
+    <input type="text" id="modal-input" autocomplete="off">
+    <div class="err-msg" id="modal-err" style="display:none;"></div>
+    <div class="modal-actions">
+      <button class="btn-outline" onclick="closeModal()">Batal</button>
+      <button class="btn" id="modal-save-btn" onclick="confirmModal()">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-bg" id="modal-confirm">
+  <div class="modal confirm-modal">
+    <h3>⚠️ Konfirmasi Hapus</h3>
+    <p id="confirm-desc">.</p>
+    <label>Ketik <strong id="confirm-keyword">HAPUS</strong> untuk konfirmasi:</label>
+    <input type="text" id="confirm-input" autocomplete="off">
+    <div class="modal-actions">
+      <button class="btn-outline" onclick="closeConfirmModal()">Batal</button>
+      <button class="btn btn-danger" id="confirm-btn" onclick="executeConfirm()">Hapus</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+  // ============================================
+  // PASTE SUPABASE CONFIG DISINI (sama persis kayak file lainnya)
+  // ============================================
+  const SUPABASE_URL = 'https://gpvahzvocznsftkreedc.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_Fij0uvdbPkVuMJOm1Sglbg_am-ChLgm';
+  // ============================================
+
+  const configMissing = SUPABASE_URL === 'PLACEHOLDER_URL';
+  if (configMissing) {
+    const warning = '<div class="config-warning"><strong>⚠️ Supabase belum dikonfigurasi!</strong></div>';
+    document.getElementById('config-warning').innerHTML = warning;
+    document.getElementById('config-warning-login').innerHTML = warning;
+    document.getElementById('btn-login').disabled = true;
+  }
+
+  const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  let currentAdmin = null;
+  let allStaff = [], allAdmins = [];
+  let modalCallback = null, confirmCallback = null;
+
+  function esc(str) {
+    if (str == null) return '';
+    return String(str).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[m]);
+  }
+  function avatarColor(name) {
+    const colors = ['#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6','#ec4899','#06b6d4','#84cc16','#f97316','#a855f7','#14b8a6','#eab308'];
+    let h = 0;
+    for (let i = 0; i < name.length; i++) h = name.charCodeAt(i) + ((h << 5) - h);
+    return colors[Math.abs(h) % colors.length];
+  }
+  function initials(name) {
+    const p = name.trim().split(/\s+/);
+    return (p[0][0] + (p[1] ? p[1][0] : '')).toUpperCase();
+  }
+  function showToast(msg, err = false) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast show' + (err ? ' err' : '');
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  window.firstSetup = async function() {
+    if (configMissing) return showToast('Supabase belum dikonfigurasi', true);
+    try {
+      const { data: existing } = await supabase.from('admins').select('id').limit(1);
+      if (existing && existing.length > 0) {
+        return showToast('Sudah ada admin terdaftar. Login dengan akun yang ada.', true);
+      }
+      const username = prompt('Buat username admin pertama (owner):');
+      if (!username || username.trim().length < 3) return showToast('Username minimal 3 karakter', true);
+      const password = prompt('Buat password (min 6 karakter):');
+      if (!password || password.length < 6) return showToast('Password minimal 6 karakter', true);
+      const { error } = await supabase.from('admins').insert({
+        username: username.trim(), password: password, role: 'owner'
+      });
+      if (error) throw error;
+      showToast('✓ Owner berhasil dibuat. Silakan login.');
+    } catch (e) { showToast('Gagal: ' + e.message, true); }
+  };
+
+  window.doAdminLogin = async function() {
+    if (configMissing) return;
+    const user = document.getElementById('admin-user').value.trim();
+    const pass = document.getElementById('admin-pass').value;
+    if (!user || !pass) return;
+    document.getElementById('btn-login').disabled = true;
+    document.getElementById('btn-login').textContent = '⏳ Login...';
+    try {
+      const { data, error } = await supabase.from('admins').select('*').ilike('username', user);
+      if (error) throw error;
+      const found = data.find(a => a.password === pass);
+      if (!found) {
+        document.getElementById('login-err').style.display = 'block';
+        document.getElementById('admin-pass').value = '';
+        document.getElementById('admin-pass').focus();
+        return;
+      }
+      currentAdmin = { id: found.id, username: found.username, role: found.role };
+      sessionStorage.setItem('admin_session', JSON.stringify(currentAdmin));
+      showApp();
+    } catch (e) {
+      showToast('Login error: ' + e.message, true);
+    } finally {
+      document.getElementById('btn-login').disabled = false;
+      document.getElementById('btn-login').textContent = 'Masuk';
+    }
+  };
+
+  document.getElementById('admin-pass').addEventListener('keypress', e => { if (e.key === 'Enter') doAdminLogin(); });
+  document.getElementById('admin-user').addEventListener('keypress', e => { if (e.key === 'Enter') document.getElementById('admin-pass').focus(); });
+
+  window.logout = function() {
+    sessionStorage.removeItem('admin_session');
+    location.reload();
+  };
+
+  async function checkExistingSession() {
+    const stored = sessionStorage.getItem('admin_session');
+    if (!stored) return false;
+    try {
+      const parsed = JSON.parse(stored);
+      const { data } = await supabase.from('admins').select('*').eq('id', parsed.id).single();
+      if (!data) {
+        sessionStorage.removeItem('admin_session');
+        return false;
+      }
+      currentAdmin = { id: data.id, username: data.username, role: data.role };
+      sessionStorage.setItem('admin_session', JSON.stringify(currentAdmin));
+      return true;
+    } catch {
+      sessionStorage.removeItem('admin_session');
+      return false;
+    }
+  }
+
+  function showApp() {
+    document.getElementById('login-view').style.display = 'none';
+    document.getElementById('app-view').style.display = 'block';
+    document.getElementById('user-name').textContent = `${currentAdmin.username} (${currentAdmin.role})`;
+    const adminTab = document.querySelector('[data-tab="admins"]');
+    if (currentAdmin.role !== 'owner') {
+      adminTab.disabled = true;
+      adminTab.title = 'Hanya owner';
+    }
+    startApp();
+  }
+
+  if (!configMissing) {
+    checkExistingSession().then(valid => { if (valid) showApp(); });
+  }
+
+  function updateClock() {
+    const now = new Date();
+    const hari = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'][now.getDay()];
+    const bulan = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'][now.getMonth()];
+    const sub = document.getElementById('header-time');
+    if (sub) sub.textContent = `${hari}, ${now.getDate()} ${bulan} ${now.getFullYear()} · ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')} WIB`;
+  }
+  setInterval(updateClock, 1000);
+  updateClock();
+
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (btn.disabled) return;
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.pane').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('pane-' + btn.dataset.tab).classList.add('active');
+    });
+  });
+
+  async function loadStaff() {
+    const { data, error } = await supabase.from('staff').select('*').order('name');
+    if (error) { showToast('Gagal load karyawan', true); return; }
+    allStaff = data || [];
+    renderStaff();
+  }
+  async function loadAdmins() {
+    const { data, error } = await supabase.from('admins').select('*');
+    if (error) { showToast('Gagal load admin', true); return; }
+    allAdmins = data || [];
+    renderAdmins();
+  }
+
+  function startApp() {
+    loadStaff();
+    loadAdmins();
+    supabase.channel('admin-staff').on('postgres_changes', { event: '*', schema: 'public', table: 'staff' }, loadStaff).subscribe();
+    supabase.channel('admin-admins').on('postgres_changes', { event: '*', schema: 'public', table: 'admins' }, loadAdmins).subscribe();
+  }
+
+  let addingStaff = false;
+  window.addStaff = async function() {
+    if (addingStaff) return;
+    const name = document.getElementById('staff-name').value.trim();
+    const pin = document.getElementById('staff-pin').value.trim();
+    if (!name) return showToast('Nama harus diisi', true);
+    if (name.length < 2) return showToast('Nama min 2 karakter', true);
+    if (!/^\d{4,6}$/.test(pin)) return showToast('PIN harus 4-6 angka', true);
+    
+    addingStaff = true;
+    document.getElementById('btn-add-staff').disabled = true;
+    document.getElementById('btn-add-staff').textContent = '⏳';
+    try {
+      if (allStaff.find(s => s.name.toLowerCase() === name.toLowerCase())) throw new Error(`Nama "${name}" sudah ada`);
+      if (allStaff.find(s => s.pin === pin)) throw new Error('PIN sudah dipakai');
+      const { error } = await supabase.from('staff').insert({ name: name, pin: pin });
+      if (error) throw error;
+      document.getElementById('staff-name').value = '';
+      document.getElementById('staff-pin').value = '';
+      document.getElementById('staff-name').focus();
+      showToast('✓ Karyawan ditambahkan');
+      await loadStaff();
+    } catch (e) {
+      showToast(e.message, true);
+    } finally {
+      addingStaff = false;
+      document.getElementById('btn-add-staff').disabled = false;
+      document.getElementById('btn-add-staff').textContent = '+ Tambah';
+    }
+  };
+
+  window.editStaffName = function(id, oldName) {
+    openModal('Ubah Nama', `Ubah nama "${oldName}"`, 'Nama baru', oldName, async (val) => {
+      if (!val) throw new Error('Tidak boleh kosong');
+      if (val === oldName) return;
+      if (val.length < 2) throw new Error('Min 2 karakter');
+      if (allStaff.find(s => s.name.toLowerCase() === val.toLowerCase() && s.id !== id)) throw new Error('Nama sudah dipakai');
+      const { error } = await supabase.from('staff').update({ name: val }).eq('id', id);
+      if (error) throw error;
+      showToast(`✓ Nama diubah jadi "${val}"`);
+      await loadStaff();
+    });
+  };
+
+  window.editStaffPin = function(id, name) {
+    openModal('Ubah PIN', `PIN baru untuk ${name}`, 'PIN baru (4-6 angka)', '', async (val) => {
+      if (!/^\d{4,6}$/.test(val)) throw new Error('PIN harus 4-6 angka');
+      if (allStaff.find(s => s.pin === val && s.id !== id)) throw new Error('PIN sudah dipakai');
+      const { error } = await supabase.from('staff').update({ pin: val }).eq('id', id);
+      if (error) throw error;
+      showToast('✓ PIN diubah');
+      await loadStaff();
+    });
+  };
+
+  window.deleteStaff = function(id, name) {
+    openConfirmModal(`Hapus karyawan "${name}"?`, 'Data history & PO yang udah di-receive tetap tersimpan.', 'HAPUS', async () => {
+      const { error } = await supabase.from('staff').delete().eq('id', id);
+      if (error) throw error;
+      showToast(`✓ "${name}" dihapus`);
+      await loadStaff();
+    });
+  };
+
+  function renderStaff() {
+    document.getElementById('staff-count').textContent = `${allStaff.length} karyawan`;
+    const tbl = document.getElementById('tbl-staff');
+    if (allStaff.length === 0) {
+      tbl.innerHTML = '<tr><td colspan="3" class="empty">Belum ada karyawan</td></tr>';
+      return;
+    }
+    tbl.innerHTML = allStaff.map(s => `<tr>
+      <td><span class="staff-ini" style="background:${avatarColor(s.name)}">${esc(initials(s.name))}</span><strong>${esc(s.name)}</strong></td>
+      <td><span class="pin-display">${esc(s.pin)}</span></td>
+      <td class="right">
+        <button class="btn btn-sm" data-action="edit-name" data-id="${esc(s.id)}" data-name="${esc(s.name)}">✏️ Nama</button>
+        <button class="btn btn-sm" data-action="edit-pin" data-id="${esc(s.id)}" data-name="${esc(s.name)}">🔑 PIN</button>
+        <button class="btn btn-sm btn-danger" data-action="delete" data-id="${esc(s.id)}" data-name="${esc(s.name)}">🗑 Hapus</button>
+      </td>
+    </tr>`).join('');
+    tbl.querySelectorAll('button[data-action]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const a = btn.dataset.action, id = btn.dataset.id, name = btn.dataset.name;
+        if (a === 'edit-name') editStaffName(id, name);
+        else if (a === 'edit-pin') editStaffPin(id, name);
+        else if (a === 'delete') deleteStaff(id, name);
+      });
+    });
+  }
+
+  let addingAdmin = false;
+  window.addAdmin = async function() {
+    if (addingAdmin) return;
+    if (currentAdmin.role !== 'owner') return showToast('Hanya owner', true);
+    const user = document.getElementById('adm-user').value.trim();
+    const pass = document.getElementById('adm-pass').value;
+    const role = document.getElementById('adm-role').value;
+    if (user.length < 3) return showToast('Username min 3 karakter', true);
+    if (pass.length < 6) return showToast('Password min 6 karakter', true);
+    if (allAdmins.find(a => a.username.toLowerCase() === user.toLowerCase())) return showToast('Username sudah ada', true);
+    
+    addingAdmin = true;
+    document.getElementById('btn-add-admin').disabled = true;
+    document.getElementById('btn-add-admin').textContent = '⏳';
+    try {
+      const { error } = await supabase.from('admins').insert({ username: user, password: pass, role: role });
+      if (error) throw error;
+      document.getElementById('adm-user').value = '';
+      document.getElementById('adm-pass').value = '';
+      showToast(`✓ Admin "${user}" ditambahkan`);
+      await loadAdmins();
+    } catch (e) {
+      showToast('Gagal: ' + e.message, true);
+    } finally {
+      addingAdmin = false;
+      document.getElementById('btn-add-admin').disabled = false;
+      document.getElementById('btn-add-admin').textContent = '+ Tambah';
+    }
+  };
+
+  window.changeAdminPass = function(id, username) {
+    openModal('Ubah Password', `Password baru untuk "${username}"`, 'Password baru (min 6)', '', async (val) => {
+      if (val.length < 6) throw new Error('Min 6 karakter');
+      const { error } = await supabase.from('admins').update({ password: val }).eq('id', id);
+      if (error) throw error;
+      showToast('✓ Password diubah');
+      await loadAdmins();
+    });
+  };
+
+  window.deleteAdmin = function(id, username) {
+    if (currentAdmin.role !== 'owner') return showToast('Hanya owner', true);
+    if (id === currentAdmin.id) return showToast('Tidak bisa hapus diri sendiri', true);
+    const owners = allAdmins.filter(a => a.role === 'owner');
+    const target = allAdmins.find(a => a.id === id);
+    if (target && target.role === 'owner' && owners.length === 1) {
+      return showToast('Tidak bisa hapus owner terakhir', true);
+    }
+    openConfirmModal(`Hapus admin "${username}"?`, 'Akun ini tidak bisa login lagi.', 'HAPUS', async () => {
+      const { error } = await supabase.from('admins').delete().eq('id', id);
+      if (error) throw error;
+      showToast(`✓ "${username}" dihapus`);
+      await loadAdmins();
+    });
+  };
+
+  function renderAdmins() {
+    document.getElementById('admin-count').textContent = `${allAdmins.length} admin`;
+    const tbl = document.getElementById('tbl-admin');
+    if (!currentAdmin) return;
+    const canManage = currentAdmin.role === 'owner';
+    if (allAdmins.length === 0) {
+      tbl.innerHTML = '<tr><td colspan="3" class="empty">Belum ada admin</td></tr>';
+      return;
+    }
+    tbl.innerHTML = allAdmins.map(a => {
+      const isMe = a.id === currentAdmin.id;
+      const canChangePass = canManage || isMe;
+      const canDelete = canManage && !isMe;
+      return `<tr>
+        <td><strong>${esc(a.username)}</strong>${isMe ? ' <span style="color:#10b981; font-size:11px;">(kamu)</span>' : ''}</td>
+        <td><span class="role-badge role-${a.role}">${a.role === 'owner' ? '👑 OWNER' : '🛡 SUPERVISOR'}</span></td>
+        <td class="right">
+          ${canChangePass ? `<button class="btn btn-sm" data-action="change-pass" data-id="${esc(a.id)}" data-name="${esc(a.username)}">🔑 Password</button>` : ''}
+          ${canDelete ? `<button class="btn btn-sm btn-danger" data-action="delete-admin" data-id="${esc(a.id)}" data-name="${esc(a.username)}">🗑 Hapus</button>` : ''}
+        </td>
+      </tr>`;
+    }).join('');
+    tbl.querySelectorAll('button[data-action]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const a = btn.dataset.action, id = btn.dataset.id, name = btn.dataset.name;
+        if (a === 'change-pass') changeAdminPass(id, name);
+        else if (a === 'delete-admin') deleteAdmin(id, name);
+      });
+    });
+  }
+
+  function openModal(title, desc, label, defaultVal, callback) {
+    document.getElementById('modal-title').textContent = title;
+    document.getElementById('modal-desc').textContent = desc;
+    document.getElementById('modal-label').textContent = label;
+    document.getElementById('modal-input').value = defaultVal;
+    document.getElementById('modal-err').style.display = 'none';
+    modalCallback = callback;
+    document.getElementById('modal-edit').classList.add('show');
+    setTimeout(() => document.getElementById('modal-input').focus(), 100);
+  }
+  window.closeModal = function() { document.getElementById('modal-edit').classList.remove('show'); modalCallback = null; };
+  window.confirmModal = async function() {
+    const val = document.getElementById('modal-input').value.trim();
+    const btn = document.getElementById('modal-save-btn');
+    btn.disabled = true; btn.textContent = '⏳';
+    try {
+      if (modalCallback) await modalCallback(val);
+      closeModal();
+    } catch (e) {
+      document.getElementById('modal-err').textContent = e.message;
+      document.getElementById('modal-err').style.display = 'block';
+    } finally {
+      btn.disabled = false; btn.textContent = 'Simpan';
+    }
+  };
+  document.getElementById('modal-input').addEventListener('keypress', e => { if (e.key === 'Enter') confirmModal(); });
+
+  function openConfirmModal(title, desc, keyword, callback) {
+    document.getElementById('confirm-desc').textContent = `${title} ${desc}`;
+    document.getElementById('confirm-keyword').textContent = keyword;
+    document.getElementById('confirm-input').value = '';
+    document.getElementById('confirm-input').dataset.keyword = keyword;
+    confirmCallback = callback;
+    document.getElementById('modal-confirm').classList.add('show');
+    setTimeout(() => document.getElementById('confirm-input').focus(), 100);
+  }
+  window.closeConfirmModal = function() { document.getElementById('modal-confirm').classList.remove('show'); confirmCallback = null; };
+  window.executeConfirm = async function() {
+    const input = document.getElementById('confirm-input');
+    const keyword = input.dataset.keyword;
+    if (input.value.trim().toUpperCase() !== keyword) return showToast(`Ketik "${keyword}" persis`, true);
+    const btn = document.getElementById('confirm-btn');
+    btn.disabled = true; btn.textContent = '⏳';
+    try {
+      if (confirmCallback) await confirmCallback();
+      closeConfirmModal();
+    } catch (e) {
+      showToast('Gagal: ' + e.message, true);
+    } finally {
+      btn.disabled = false; btn.textContent = 'Hapus';
+    }
+  };
+  document.getElementById('confirm-input').addEventListener('keypress', e => { if (e.key === 'Enter') executeConfirm(); });
+  document.getElementById('staff-pin').addEventListener('input', e => { e.target.value = e.target.value.replace(/\D/g, ''); });
+</script>
+
+</body>
+</html>

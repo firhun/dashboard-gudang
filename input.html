@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Input Gudang Distribusi</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f8fafc; color: #0f172a; line-height: 1.5; padding: 24px; min-height: 100vh; }
+  .container { max-width: 1200px; margin: 0 auto; }
+  .header { background: linear-gradient(135deg, #1e293b 0%, #334155 100%); padding: 18px 24px; border-radius: 14px; margin-bottom: 18px; color: white; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
+  .brand { display: flex; align-items: center; gap: 12px; }
+  .logo { width: 40px; height: 40px; background: linear-gradient(135deg, #3b82f6, #06b6d4); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 800; }
+  .title { font-size: 17px; font-weight: 700; }
+  .sub { font-size: 12px; color: #cbd5e1; }
+  .right-info { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .user-box { text-align: right; font-size: 12px; color: #cbd5e1; }
+  .user-box strong { display: block; font-size: 14px; color: white; }
+  .user-box a { color: #fbbf24; font-size: 11px; cursor: pointer; }
+  .nav-btn { background: white; color: #1e293b; padding: 8px 14px; border-radius: 8px; text-decoration: none; font-size: 13px; font-weight: 600; }
+  .tabs { display: flex; gap: 6px; margin-bottom: 18px; flex-wrap: wrap; }
+  .tab-btn { padding: 10px 18px; font-size: 13px; border: 1px solid #e2e8f0; background: white; border-radius: 8px; cursor: pointer; color: #64748b; font-weight: 600; font-family: inherit; }
+  .tab-btn.active { background: #1e293b; color: white; border-color: #1e293b; }
+  .pane { display: none; }
+  .pane.active { display: block; }
+  .card { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); margin-bottom: 16px; }
+  .ch-t { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+  .ch-d { font-size: 13px; color: #64748b; margin-bottom: 18px; }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } }
+  label { display: block; font-size: 12px; color: #475569; margin-bottom: 6px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+  input, select { width: 100%; padding: 12px 14px; border: 1px solid #cbd5e1; border-radius: 8px; font-family: inherit; font-size: 14px; background: white; }
+  input:focus, select:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
+  .btn { background: #1e293b; color: white; padding: 12px 24px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; font-family: inherit; font-size: 14px; margin-top: 20px; }
+  .btn:hover:not(:disabled) { background: #0f172a; }
+  .btn:disabled { background: #cbd5e1; cursor: not-allowed; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { text-align: left; padding: 10px 8px; font-weight: 700; color: #64748b; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; background: #f8fafc; }
+  td { padding: 14px 8px; border-bottom: 1px solid #f1f5f9; }
+  .right { text-align: right; }
+  .empty { text-align: center; padding: 40px 0; color: #94a3b8; font-style: italic; }
+  .btn-act { font-size: 12px; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-family: inherit; font-weight: 700; border: none; }
+  .btn-arr { background: #fef3c7; color: #92400e; border: 1px solid #fbbf24; }
+  .btn-arr:hover:not(:disabled) { background: #fde68a; }
+  .btn-rec { background: #10b981; color: white; }
+  .btn-rec:hover:not(:disabled) { background: #059669; }
+  .btn-act:disabled { opacity: 0.5; cursor: not-allowed; }
+  .login-bg { min-height: calc(100vh - 48px); display: flex; align-items: center; justify-content: center; }
+  .login-card { max-width: 460px; width: 100%; background: white; border-radius: 16px; padding: 36px 32px; box-shadow: 0 10px 40px rgba(0,0,0,0.08); text-align: center; }
+  .login-logo { width: 56px; height: 56px; background: linear-gradient(135deg, #3b82f6, #06b6d4); border-radius: 14px; margin: 0 auto 16px; display: flex; align-items: center; justify-content: center; font-size: 26px; font-weight: 800; color: white; }
+  .login-title { font-size: 22px; font-weight: 800; margin-bottom: 6px; }
+  .login-sub { font-size: 13px; color: #64748b; margin-bottom: 24px; }
+  .staff-pick { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 10px; margin-bottom: 20px; max-height: 400px; overflow-y: auto; padding: 4px; }
+  .staff-btn { padding: 14px 8px; border: 2px solid #e2e8f0; background: white; border-radius: 10px; cursor: pointer; font-family: inherit; transition: all 0.15s; }
+  .staff-btn:hover { border-color: #3b82f6; transform: translateY(-1px); }
+  .sb-ini { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; color: white; margin: 0 auto 6px; }
+  .sb-name { font-size: 12px; font-weight: 700; word-break: break-word; }
+  .pin-input { font-size: 28px; font-weight: 700; text-align: center; letter-spacing: 12px; padding: 16px; border: 2px solid #cbd5e1; border-radius: 10px; width: 100%; font-family: inherit; }
+  .pin-input:focus { outline: none; border-color: #3b82f6; }
+  .toast { position: fixed; bottom: 30px; right: 30px; background: #10b981; color: white; padding: 14px 22px; border-radius: 8px; font-size: 14px; font-weight: 600; opacity: 0; transform: translateY(20px); transition: all 0.3s; pointer-events: none; z-index: 200; box-shadow: 0 8px 24px rgba(0,0,0,0.2); max-width: 90vw; }
+  .toast.show { opacity: 1; transform: translateY(0); }
+  .toast.err { background: #ef4444; }
+  .err-msg { color: #ef4444; font-size: 12px; margin-top: 8px; }
+  .config-warning { background: #fee2e2; border: 1px solid #ef4444; color: #991b1b; padding: 16px 20px; border-radius: 12px; margin-bottom: 16px; font-size: 13px; }
+  .loading { text-align: center; padding: 30px 20px; color: #94a3b8; grid-column: 1/-1; }
+  .spinner { display: inline-block; width: 32px; height: 32px; border: 3px solid #e2e8f0; border-top-color: #3b82f6; border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 12px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<div id="login-view" class="container login-bg" style="display: none;">
+  <div class="login-card">
+    <div class="login-logo">G</div>
+    <div class="login-title">Halaman Input</div>
+    <div class="login-sub">Pilih nama kamu untuk mulai</div>
+    <div id="config-warning-login"></div>
+    <div id="staff-pick" class="staff-pick"><div class="loading"><div class="spinner"></div><div>Memuat daftar karyawan...</div></div></div>
+    <div id="pin-section" style="display: none;">
+      <label style="text-align:left;">PIN untuk <span id="pin-for-name" style="color:#3b82f6;"></span></label>
+      <input type="password" class="pin-input" id="pin-input" maxlength="6" inputmode="numeric" pattern="[0-9]*" placeholder="••••" autocomplete="off">
+      <div class="err-msg" id="pin-err" style="display:none;">PIN salah, coba lagi</div>
+      <button class="btn" id="login-btn" style="width:100%;" onclick="doLogin()">Masuk</button>
+      <a href="#" onclick="resetLogin(); return false;" style="display:block; margin-top:12px; font-size:12px; color:#64748b;">← Pilih nama lain</a>
+    </div>
+  </div>
+</div>
+
+<div id="app-view" class="container" style="display: none;">
+<div class="header">
+  <div class="brand">
+    <div class="logo">G</div>
+    <div><div class="title">Halaman Input</div><div class="sub" id="header-time">Memuat...</div></div>
+  </div>
+  <div class="right-info">
+    <div class="user-box">Login sebagai<strong id="user-name">-</strong><a href="#" onclick="logout(); return false;">Keluar</a></div>
+    <a href="index.html" class="nav-btn">📊 Dashboard</a>
+  </div>
+</div>
+
+<div id="config-warning"></div>
+
+<div class="tabs">
+  <button class="tab-btn active" data-tab="add">+ Tambah PO Baru</button>
+  <button class="tab-btn" data-tab="arrived">Tandai Barang Datang</button>
+  <button class="tab-btn" data-tab="receive">Receive Barang</button>
+</div>
+
+<div class="pane active" id="pane-add">
+  <div class="card">
+    <div class="ch-t">Tambah PO Baru</div>
+    <div class="ch-d">Input PO sebelum barang datang ke gudang.</div>
+    <div class="form-grid">
+      <div><label>Nomor PO *</label><input type="text" id="new-po" placeholder="PO-2401" maxlength="50"></div>
+      <div><label>Nama Supplier *</label><input type="text" id="new-supplier" placeholder="PT Sinar Jaya" maxlength="100"></div>
+      <div><label>Jumlah Koli *</label><input type="number" id="new-koli" placeholder="50" min="1" max="999999"></div>
+      <div><label>Nominal (Rp) *</label><input type="number" id="new-amount" placeholder="50000000" min="0" max="999999999999"></div>
+    </div>
+    <button class="btn" id="btn-save" onclick="savePO()">💾 Simpan PO</button>
+  </div>
+</div>
+
+<div class="pane" id="pane-arrived">
+  <div class="card">
+    <div class="ch-t">Tandai Barang Datang</div>
+    <div class="ch-d">Klik tombol kalau barang udah sampai di gudang.</div>
+    <table>
+      <thead><tr><th>No. PO</th><th>Supplier</th><th class="right">Koli</th><th class="right">Nominal</th><th class="right">Aksi</th></tr></thead>
+      <tbody id="tbl-pending"></tbody>
+    </table>
+  </div>
+</div>
+
+<div class="pane" id="pane-receive">
+  <div class="card">
+    <div class="ch-t">Receive Barang</div>
+    <div class="ch-d">Klik "Receive" kalau kamu yang nerima. Nama kamu otomatis tercatat.</div>
+    <table>
+      <thead><tr><th>No. PO</th><th>Supplier</th><th class="right">Koli</th><th class="right">Nominal</th><th class="right">Aksi</th></tr></thead>
+      <tbody id="tbl-arrived"></tbody>
+    </table>
+  </div>
+</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+  // ============================================
+  // PASTE SUPABASE CONFIG DISINI (sama persis kayak index.html)
+  // ============================================
+  const SUPABASE_URL = 'https://gpvahzvocznsftkreedc.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_Fij0uvdbPkVuMJOm1Sglbg_am-ChLgm';
+  // ============================================
+
+  const configMissing = SUPABASE_URL === 'PLACEHOLDER_URL';
+  if (configMissing) {
+    const warning = '<div class="config-warning"><strong>⚠️ Supabase belum dikonfigurasi!</strong></div>';
+    document.getElementById('config-warning').innerHTML = warning;
+    document.getElementById('config-warning-login').innerHTML = warning;
+  }
+
+  const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  let currentUser = localStorage.getItem('gudang_user') || '';
+  let allPOs = [], allStaff = [];
+  let selectedStaffName = '';
+
+  function esc(str) {
+    if (str == null) return '';
+    return String(str).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[m]);
+  }
+  function avatarColor(name) {
+    const colors = ['#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6','#ec4899','#06b6d4','#84cc16','#f97316','#a855f7','#14b8a6','#eab308'];
+    let h = 0;
+    for (let i = 0; i < name.length; i++) h = name.charCodeAt(i) + ((h << 5) - h);
+    return colors[Math.abs(h) % colors.length];
+  }
+  function initials(name) {
+    const p = name.trim().split(/\s+/);
+    return (p[0][0] + (p[1] ? p[1][0] : '')).toUpperCase();
+  }
+  function formatRp(n) {
+    if (!n || n === 0) return 'Rp 0';
+    if (n >= 1000000000) return 'Rp ' + (n/1000000000).toFixed(2).replace(/\.?0+$/, '') + ' M';
+    if (n >= 1000000) return 'Rp ' + (n/1000000).toFixed(1).replace(/\.0$/, '') + ' Jt';
+    if (n >= 1000) return 'Rp ' + Math.round(n/1000) + ' Rb';
+    return 'Rp ' + Math.round(n);
+  }
+  function todayStr() {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  }
+  function showToast(msg, err = false) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast show' + (err ? ' err' : '');
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  document.getElementById('login-view').style.display = 'flex';
+
+  async function loadStaff() {
+    const { data, error } = await supabase.from('staff').select('*').order('name');
+    if (error) { console.error(error); return; }
+    allStaff = data || [];
+    if (currentUser && allStaff.find(s => s.name === currentUser)) {
+      showApp();
+    } else {
+      if (currentUser) {
+        currentUser = '';
+        localStorage.removeItem('gudang_user');
+      }
+      renderStaffPicker();
+    }
+  }
+
+  function renderStaffPicker() {
+    const div = document.getElementById('staff-pick');
+    if (allStaff.length === 0) {
+      div.innerHTML = '<div class="loading">Belum ada karyawan terdaftar.<br><br>Admin perlu tambahin dulu di <a href="admin.html" style="color:#3b82f6;">halaman Admin</a>.</div>';
+      return;
+    }
+    div.innerHTML = allStaff.map(s => `
+      <div class="staff-btn" data-name="${esc(s.name)}">
+        <div class="sb-ini" style="background:${avatarColor(s.name)}">${esc(initials(s.name))}</div>
+        <div class="sb-name">${esc(s.name)}</div>
+      </div>
+    `).join('');
+    div.querySelectorAll('.staff-btn').forEach(btn => {
+      btn.addEventListener('click', () => pickStaff(btn.dataset.name));
+    });
+  }
+
+  function pickStaff(name) {
+    selectedStaffName = name;
+    document.getElementById('staff-pick').style.display = 'none';
+    document.getElementById('pin-section').style.display = 'block';
+    document.getElementById('pin-for-name').textContent = name;
+    document.getElementById('pin-err').style.display = 'none';
+    document.getElementById('pin-input').value = '';
+    setTimeout(() => document.getElementById('pin-input').focus(), 100);
+  }
+
+  window.resetLogin = function() {
+    selectedStaffName = '';
+    document.getElementById('staff-pick').style.display = 'grid';
+    document.getElementById('pin-section').style.display = 'none';
+    document.getElementById('pin-input').value = '';
+    document.getElementById('pin-err').style.display = 'none';
+  };
+
+  window.doLogin = function() {
+    const pin = document.getElementById('pin-input').value.trim();
+    const staff = allStaff.find(s => s.name === selectedStaffName);
+    if (!staff) { showToast('Karyawan tidak ditemukan', true); resetLogin(); return; }
+    if (pin !== staff.pin) {
+      document.getElementById('pin-err').style.display = 'block';
+      document.getElementById('pin-input').value = '';
+      document.getElementById('pin-input').focus();
+      return;
+    }
+    currentUser = selectedStaffName;
+    localStorage.setItem('gudang_user', currentUser);
+    showApp();
+  };
+
+  document.getElementById('pin-input').addEventListener('keypress', e => { if (e.key === 'Enter') doLogin(); });
+  document.getElementById('pin-input').addEventListener('input', e => { e.target.value = e.target.value.replace(/\D/g, ''); });
+
+  window.logout = function() {
+    localStorage.removeItem('gudang_user');
+    location.reload();
+  };
+
+  function showApp() {
+    document.getElementById('login-view').style.display = 'none';
+    document.getElementById('app-view').style.display = 'block';
+    document.getElementById('user-name').textContent = currentUser;
+    startApp();
+  }
+
+  function updateClock() {
+    const now = new Date();
+    const hari = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'][now.getDay()];
+    const bulan = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'][now.getMonth()];
+    const sub = document.getElementById('header-time');
+    if (sub) sub.textContent = `${hari}, ${now.getDate()} ${bulan} ${now.getFullYear()} · ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')} WIB`;
+  }
+  setInterval(updateClock, 1000);
+  updateClock();
+
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.pane').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('pane-' + btn.dataset.tab).classList.add('active');
+    });
+  });
+
+  let saving = false;
+  window.savePO = async function() {
+    if (saving) return;
+    const po = document.getElementById('new-po').value.trim();
+    const supplier = document.getElementById('new-supplier').value.trim();
+    const koli = parseInt(document.getElementById('new-koli').value);
+    const amount = parseInt(document.getElementById('new-amount').value);
+    if (!po) return showToast('Nomor PO harus diisi', true);
+    if (!supplier) return showToast('Supplier harus diisi', true);
+    if (!koli || koli < 1) return showToast('Koli minimal 1', true);
+    if (!amount || amount < 1) return showToast('Nominal minimal 1', true);
+    if (allPOs.find(p => p.po_number.toLowerCase() === po.toLowerCase())) return showToast(`PO "${po}" sudah ada!`, true);
+
+    saving = true;
+    document.getElementById('btn-save').disabled = true;
+    document.getElementById('btn-save').textContent = '⏳ Menyimpan...';
+    try {
+      const { error } = await supabase.from('pos').insert({
+        po_number: po, supplier: supplier, koli: koli, amount: amount,
+        status: 'pending', created_by: currentUser
+      });
+      if (error) throw error;
+      document.getElementById('new-po').value = '';
+      document.getElementById('new-supplier').value = '';
+      document.getElementById('new-koli').value = '';
+      document.getElementById('new-amount').value = '';
+      showToast('✓ PO berhasil ditambahkan');
+      await loadPOs();
+    } catch (e) {
+      console.error(e);
+      showToast('Gagal: ' + e.message, true);
+    } finally {
+      saving = false;
+      document.getElementById('btn-save').disabled = false;
+      document.getElementById('btn-save').textContent = '💾 Simpan PO';
+    }
+  };
+
+  window.markArrived = async function(poId, btn) {
+    if (btn.disabled) return;
+    btn.disabled = true;
+    btn.textContent = '⏳';
+    try {
+      // Only update if still pending (prevents race condition)
+      const { data, error } = await supabase.from('pos')
+        .update({ status: 'arrived', arrived_at: new Date().toISOString() })
+        .eq('id', poId).eq('status', 'pending').select();
+      if (error) throw error;
+      if (!data || data.length === 0) throw new Error('PO sudah ditandai sebelumnya');
+      showToast('✓ Ditandai sudah datang');
+      await loadPOs();
+    } catch (e) {
+      showToast('Gagal: ' + e.message, true);
+      btn.disabled = false;
+      btn.textContent = '📦 Tandai Datang';
+    }
+  };
+
+  window.receivePO = async function(poId, btn) {
+    if (btn.disabled) return;
+    btn.disabled = true;
+    btn.textContent = '⏳';
+    try {
+      const { data, error } = await supabase.from('pos')
+        .update({
+          status: 'received', received_by: currentUser,
+          received_at: new Date().toISOString(), received_date: todayStr()
+        })
+        .eq('id', poId).eq('status', 'arrived').select();
+      if (error) throw error;
+      if (!data || data.length === 0) throw new Error('PO sudah di-receive atau belum datang');
+      showToast(`✓ ${currentUser} berhasil receive`);
+      await loadPOs();
+    } catch (e) {
+      showToast('Gagal: ' + e.message, true);
+      btn.disabled = false;
+      btn.textContent = '✓ Receive';
+    }
+  };
+
+  async function loadPOs() {
+    const { data, error } = await supabase.from('pos').select('*').order('created_at', { ascending: false });
+    if (error) { console.error(error); return; }
+    allPOs = data || [];
+    renderTables();
+  }
+
+  function startApp() {
+    loadPOs();
+    supabase.channel('input-pos').on('postgres_changes', { event: '*', schema: 'public', table: 'pos' }, () => loadPOs()).subscribe();
+    setInterval(loadPOs, 15000);
+  }
+
+  function renderTables() {
+    const pending = allPOs.filter(p => p.status === 'pending');
+    const arrived = allPOs.filter(p => p.status === 'arrived');
+
+    const tblP = document.getElementById('tbl-pending');
+    tblP.innerHTML = pending.length === 0
+      ? '<tr><td colspan="5" class="empty">Tidak ada PO menunggu</td></tr>'
+      : pending.map(p => `<tr>
+          <td><strong>${esc(p.po_number)}</strong></td>
+          <td>${esc(p.supplier)}</td>
+          <td class="right">${(p.koli || 0).toLocaleString('id-ID')}</td>
+          <td class="right">${formatRp(p.amount)}</td>
+          <td class="right"><button class="btn-act btn-arr" data-po="${esc(p.id)}">📦 Tandai Datang</button></td>
+        </tr>`).join('');
+    tblP.querySelectorAll('.btn-arr').forEach(btn => btn.addEventListener('click', () => markArrived(btn.dataset.po, btn)));
+
+    const tblA = document.getElementById('tbl-arrived');
+    tblA.innerHTML = arrived.length === 0
+      ? '<tr><td colspan="5" class="empty">Tidak ada barang siap di-receive</td></tr>'
+      : arrived.map(p => `<tr>
+          <td><strong>${esc(p.po_number)}</strong></td>
+          <td>${esc(p.supplier)}</td>
+          <td class="right">${(p.koli || 0).toLocaleString('id-ID')}</td>
+          <td class="right">${formatRp(p.amount)}</td>
+          <td class="right"><button class="btn-act btn-rec" data-po="${esc(p.id)}">✓ Receive</button></td>
+        </tr>`).join('');
+    tblA.querySelectorAll('.btn-rec').forEach(btn => btn.addEventListener('click', () => receivePO(btn.dataset.po, btn)));
+  }
+
+  // Subscribe to staff changes during login
+  supabase.channel('login-staff').on('postgres_changes', { event: '*', schema: 'public', table: 'staff' }, () => {
+    if (document.getElementById('login-view').style.display !== 'none') loadStaff();
+  }).subscribe();
+
+  loadStaff();
+</script>
+
+</body>
+</html>

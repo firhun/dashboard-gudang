@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Gudang Distribusi</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f8fafc; color: #0f172a; line-height: 1.5; padding: 24px; min-height: 100vh; }
+  .container { max-width: 1600px; margin: 0 auto; }
+  .header { background: linear-gradient(135deg, #1e293b 0%, #334155 100%); padding: 20px 28px; border-radius: 14px; margin-bottom: 18px; color: white; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
+  .brand { display: flex; align-items: center; gap: 14px; }
+  .logo { width: 44px; height: 44px; background: linear-gradient(135deg, #3b82f6, #06b6d4); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 800; }
+  .title { font-size: 19px; font-weight: 700; }
+  .sub { font-size: 12px; color: #cbd5e1; margin-top: 2px; display: flex; align-items: center; gap: 8px; }
+  .live-dot { width: 8px; height: 8px; background: #10b981; border-radius: 50%; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+  .right-info { display: flex; align-items: center; gap: 20px; }
+  .time-l { font-size: 10px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1.5px; }
+  .time-v { font-size: 22px; font-weight: 700; font-family: 'Courier New', monospace; color: #fbbf24; }
+  .nav-btn { background: white; color: #1e293b; padding: 10px 16px; border-radius: 8px; text-decoration: none; font-size: 13px; font-weight: 600; }
+  .nav-btn:hover { background: #f1f5f9; }
+  .tabs { display: flex; gap: 6px; margin-bottom: 18px; flex-wrap: wrap; }
+  .tab-btn { padding: 10px 18px; font-size: 13px; border: 1px solid #e2e8f0; background: white; border-radius: 8px; cursor: pointer; color: #64748b; font-family: inherit; font-weight: 600; }
+  .tab-btn.active { background: #1e293b; color: white; border-color: #1e293b; }
+  .pane { display: none; }
+  .pane.active { display: block; }
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 18px; }
+  .stat { background: white; border-radius: 12px; padding: 18px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); position: relative; overflow: hidden; }
+  .stat::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; }
+  .stat.b::before { background: linear-gradient(180deg, #3b82f6, #06b6d4); }
+  .stat.w::before { background: linear-gradient(180deg, #f59e0b, #f97316); }
+  .stat.g::before { background: linear-gradient(180deg, #10b981, #059669); }
+  .stat-row { display: flex; justify-content: space-between; align-items: flex-start; }
+  .stat-l { font-size: 11px; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+  .stat-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+  .stat.b .stat-icon { background: #dbeafe; }
+  .stat.w .stat-icon { background: #fef3c7; }
+  .stat.g .stat-icon { background: #d1fae5; }
+  .stat-v { font-size: 32px; font-weight: 800; margin: 6px 0; letter-spacing: -1px; }
+  .stat-sub { font-size: 12px; color: #94a3b8; }
+  .card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); margin-bottom: 16px; }
+  .ch { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid #e2e8f0; }
+  .ch-t { font-size: 15px; font-weight: 700; color: #1e293b; }
+  .ch-m { font-size: 12px; color: #64748b; background: #f1f5f9; padding: 5px 12px; border-radius: 6px; font-weight: 600; }
+  .staff-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; }
+  .emp { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px; transition: all 0.2s; }
+  .emp.act { background: #f0fdf4; border-color: #86efac; border-left: 3px solid #10b981; }
+  .emp.top { background: linear-gradient(135deg, #fef3c7, #fef9e8); border: 2px solid #fbbf24; }
+  .emp.zero { background: #f1f5f9; opacity: 0.75; }
+  .emp-head { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+  .emp-ini { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; color: white; flex-shrink: 0; }
+  .emp-n { font-size: 13px; font-weight: 700; color: #1e293b; word-break: break-word; }
+  .emp-st { font-size: 9px; font-weight: 800; padding: 2px 6px; border-radius: 4px; margin-top: 2px; display: inline-block; letter-spacing: 0.5px; }
+  .emp-st.a { background: #10b981; color: white; }
+  .emp-st.t { background: #d97706; color: white; }
+  .emp-st.z { background: #cbd5e1; color: #475569; }
+  .emp-row { display: flex; justify-content: space-between; align-items: flex-end; gap: 8px; }
+  .emp-num { font-size: 30px; font-weight: 900; line-height: 1; letter-spacing: -1.5px; }
+  .emp-num.a { color: #10b981; }
+  .emp-num.t { color: #d97706; }
+  .emp-num.z { color: #cbd5e1; }
+  .emp-d { font-size: 11px; color: #64748b; text-align: right; }
+  .emp-d strong { color: #1e293b; display: block; font-size: 12px; }
+  table { width: 100%; font-size: 13px; border-collapse: collapse; }
+  th { color: #64748b; font-size: 10px; padding: 10px 8px; text-align: left; text-transform: uppercase; letter-spacing: 1px; background: #f8fafc; font-weight: 700; }
+  th:first-child { border-radius: 6px 0 0 6px; }
+  th:last-child { border-radius: 0 6px 6px 0; }
+  td { padding: 14px 8px; border-bottom: 1px solid #f1f5f9; }
+  .right { text-align: right; }
+  .empty { text-align: center; padding: 40px 0; color: #94a3b8; font-style: italic; }
+  .status-badge { font-size: 11px; padding: 5px 12px; border-radius: 6px; font-weight: 700; white-space: nowrap; }
+  .sb-p { background: #dbeafe; color: #1e40af; }
+  .sb-a { background: #fef3c7; color: #92400e; }
+  .rank-row { display: flex; align-items: center; gap: 14px; padding: 14px 0; border-bottom: 1px solid #f1f5f9; }
+  .rank-row:last-child { border-bottom: none; }
+  .rank-n { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 15px; flex-shrink: 0; }
+  .r1 { background: linear-gradient(135deg, #fbbf24, #d97706); color: white; }
+  .r2 { background: linear-gradient(135deg, #cbd5e1, #94a3b8); color: white; }
+  .r3 { background: linear-gradient(135deg, #b45309, #92400e); color: white; }
+  .ro { background: #e2e8f0; color: #64748b; }
+  .rank-info { flex: 1; min-width: 0; }
+  .rank-name { font-weight: 700; font-size: 15px; color: #1e293b; word-break: break-word; }
+  .rank-meta { font-size: 12px; color: #64748b; margin-top: 2px; }
+  .rank-val { text-align: right; flex-shrink: 0; }
+  .rank-c { font-size: 22px; font-weight: 800; color: #1e293b; }
+  .rank-cl { font-size: 11px; color: #94a3b8; }
+  .loading { text-align: center; padding: 60px 20px; color: #94a3b8; }
+  .spinner { display: inline-block; width: 32px; height: 32px; border: 3px solid #e2e8f0; border-top-color: #3b82f6; border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 12px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .config-warning { background: #fee2e2; border: 1px solid #ef4444; color: #991b1b; padding: 16px 20px; border-radius: 12px; margin-bottom: 16px; font-size: 13px; }
+  @media (max-width: 768px) { body { padding: 12px; } .stat-v { font-size: 24px; } .stats { grid-template-columns: 1fr; } .staff-grid { grid-template-columns: repeat(2, 1fr); } }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<div class="header">
+  <div class="brand">
+    <div class="logo">G</div>
+    <div>
+      <div class="title">Gudang Distribusi</div>
+      <div class="sub"><span class="live-dot"></span> Live · <span id="header-time">Memuat...</span></div>
+    </div>
+  </div>
+  <div class="right-info">
+    <div>
+      <div class="time-l">Auto Reset</div>
+      <div class="time-v" id="countdown">--:--:--</div>
+    </div>
+    <a href="input.html" class="nav-btn">📝 Input</a>
+    <a href="admin.html" class="nav-btn">⚙️ Admin</a>
+  </div>
+</div>
+
+<div id="config-warning"></div>
+
+<div class="tabs">
+  <button class="tab-btn active" data-tab="main">Tracking Utama</button>
+  <button class="tab-btn" data-tab="ranking">Ranking 7 Hari</button>
+  <button class="tab-btn" data-tab="history">Arsip History</button>
+</div>
+
+<div class="pane active" id="pane-main">
+  <div class="stats">
+    <div class="stat b"><div class="stat-row"><div><div class="stat-l">Belum Sampai</div><div class="stat-v" id="s-pending">0</div><div class="stat-sub"><span id="s-pending-koli">0</span> koli · <span id="s-pending-nominal">Rp 0</span></div></div><div class="stat-icon">🚚</div></div></div>
+    <div class="stat w"><div class="stat-row"><div><div class="stat-l">Belum Receive</div><div class="stat-v" id="s-arrived">0</div><div class="stat-sub"><span id="s-arrived-koli">0</span> koli · <span id="s-arrived-nominal">Rp 0</span></div></div><div class="stat-icon">⏰</div></div></div>
+    <div class="stat g"><div class="stat-row"><div><div class="stat-l">Sudah Receive Hari Ini</div><div class="stat-v" id="s-received">0</div><div class="stat-sub"><span id="s-received-koli">0</span> koli · <span id="s-received-nominal">Rp 0</span></div></div><div class="stat-icon">✅</div></div></div>
+  </div>
+
+  <div class="card">
+    <div class="ch"><div class="ch-t">👥 Performance Tim Hari Ini</div><div class="ch-m" id="meta-staff">Memuat...</div></div>
+    <div class="staff-grid" id="staff-grid"><div class="loading" style="grid-column:1/-1;"><div class="spinner"></div><div>Memuat data karyawan...</div></div></div>
+  </div>
+
+  <div class="card">
+    <div class="ch"><div class="ch-t">📦 Daftar Barang Aktif</div><div class="ch-m" id="meta-merged">0 PO</div></div>
+    <table>
+      <thead><tr><th>No. PO</th><th>Supplier</th><th class="right">Koli</th><th class="right">Nominal</th><th class="right">Status</th></tr></thead>
+      <tbody id="tbl-merged"><tr><td colspan="5" class="loading"><div class="spinner"></div><div>Memuat data PO...</div></td></tr></tbody>
+    </table>
+  </div>
+</div>
+
+<div class="pane" id="pane-ranking">
+  <div class="card">
+    <div class="ch"><div class="ch-t">🏆 Ranking 7 Hari Terakhir</div><div class="ch-m">Berdasarkan total PO di-receive</div></div>
+    <div id="ranking-list"></div>
+  </div>
+</div>
+
+<div class="pane" id="pane-history">
+  <div class="card">
+    <div class="ch"><div class="ch-t">📅 Arsip History Harian</div><div class="ch-m">Tersimpan otomatis tiap 00:00</div></div>
+    <table>
+      <thead><tr><th>Tanggal</th><th class="right">Total PO</th><th class="right">Total Koli</th><th class="right">Nominal</th><th class="right">Top Performer</th></tr></thead>
+      <tbody id="tbl-history"></tbody>
+    </table>
+  </div>
+</div>
+
+</div>
+
+<script type="module">
+  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+  // ============================================
+  // PASTE SUPABASE CONFIG DISINI
+  // ============================================
+  const SUPABASE_URL = 'https://gpvahzvocznsftkreedc.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_Fij0uvdbPkVuMJOm1Sglbg_am-ChLgm';
+  // ============================================
+
+  if (SUPABASE_URL === 'PLACEHOLDER_URL') {
+    document.getElementById('config-warning').innerHTML = 
+      '<div class="config-warning"><strong>⚠️ Supabase belum dikonfigurasi!</strong><br>Edit file ini, paste SUPABASE_URL dan SUPABASE_KEY dari Supabase Dashboard.</div>';
+  }
+
+  const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  let allPOs = [], allHistory = [], allStaff = [];
+
+  function esc(str) {
+    if (str == null) return '';
+    return String(str).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[m]);
+  }
+  function avatarColor(name) {
+    const colors = ['#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6','#ec4899','#06b6d4','#84cc16','#f97316','#a855f7','#14b8a6','#eab308'];
+    let h = 0;
+    for (let i = 0; i < name.length; i++) h = name.charCodeAt(i) + ((h << 5) - h);
+    return colors[Math.abs(h) % colors.length];
+  }
+  function initials(name) {
+    const p = name.trim().split(/\s+/);
+    return (p[0][0] + (p[1] ? p[1][0] : '')).toUpperCase();
+  }
+  function formatRp(n) {
+    if (!n || n === 0) return 'Rp 0';
+    if (n >= 1000000000) return 'Rp ' + (n/1000000000).toFixed(2).replace(/\.?0+$/, '') + ' M';
+    if (n >= 1000000) return 'Rp ' + (n/1000000).toFixed(1).replace(/\.0$/, '') + ' Jt';
+    if (n >= 1000) return 'Rp ' + Math.round(n/1000) + ' Rb';
+    return 'Rp ' + Math.round(n);
+  }
+  function todayStr() {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  }
+  function dateStr(d) {
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  }
+
+  function updateClock() {
+    const now = new Date();
+    const hari = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'][now.getDay()];
+    const bulan = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'][now.getMonth()];
+    document.getElementById('header-time').textContent = `${hari}, ${now.getDate()} ${bulan} ${now.getFullYear()} · ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')} WIB`;
+    const midnight = new Date(now);
+    midnight.setHours(24, 0, 0, 0);
+    const diff = midnight - now;
+    const h = Math.floor(diff / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    const s = Math.floor((diff % 60000) / 1000);
+    document.getElementById('countdown').textContent = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  }
+  setInterval(updateClock, 1000);
+  updateClock();
+
+  // === Archive yesterday's data (atomic via UPSERT) ===
+  let archiving = false;
+  async function checkAndArchive() {
+    if (archiving) return;
+    archiving = true;
+    try {
+      const today = todayStr();
+      const datesToArchive = new Set();
+      allPOs.forEach(p => {
+        if (p.status === 'received' && p.received_date && p.received_date !== today) {
+          datesToArchive.add(p.received_date);
+        }
+      });
+      for (const date of datesToArchive) {
+        // Check if archive already exists for this date
+        const { data: existing } = await supabase.from('history').select('date').eq('date', date).maybeSingle();
+        if (existing) continue;
+        
+        const dayPOs = allPOs.filter(p => p.status === 'received' && p.received_date === date);
+        if (dayPOs.length === 0) continue;
+        
+        const tKoli = dayPOs.reduce((s, p) => s + (p.koli || 0), 0);
+        const tAmount = dayPOs.reduce((s, p) => s + (p.amount || 0), 0);
+        const receivers = {};
+        dayPOs.forEach(p => {
+          const r = p.received_by || '(unknown)';
+          if (!receivers[r]) receivers[r] = { count: 0, koli: 0, amount: 0 };
+          receivers[r].count++;
+          receivers[r].koli += (p.koli || 0);
+          receivers[r].amount += (p.amount || 0);
+        });
+        const top = Object.entries(receivers).sort((a,b) => b[1].count - a[1].count)[0];
+        
+        await supabase.from('history').upsert({
+          date: date,
+          total_po: dayPOs.length,
+          total_koli: tKoli,
+          total_amount: tAmount,
+          top_performer: top ? `${top[0]} (${top[1].count})` : '-',
+          receivers: receivers
+        }, { onConflict: 'date' });
+      }
+    } catch (e) {
+      console.error('Archive error:', e);
+    } finally {
+      archiving = false;
+    }
+  }
+
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.pane').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('pane-' + btn.dataset.tab).classList.add('active');
+    });
+  });
+
+  // === LOAD DATA ===
+  async function loadAll() {
+    const [pos, hist, staff] = await Promise.all([
+      supabase.from('pos').select('*').order('created_at', { ascending: false }),
+      supabase.from('history').select('*').order('date', { ascending: false }),
+      supabase.from('staff').select('*').order('name')
+    ]);
+    if (pos.data) allPOs = pos.data;
+    if (hist.data) allHistory = hist.data;
+    if (staff.data) allStaff = staff.data;
+    renderDashboard();
+    renderRanking();
+    renderHistory();
+    checkAndArchive();
+  }
+
+  // === REAL-TIME SUBSCRIPTIONS ===
+  supabase.channel('pos-changes')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'pos' }, () => loadAll())
+    .subscribe();
+  supabase.channel('history-changes')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'history' }, () => loadAll())
+    .subscribe();
+  supabase.channel('staff-changes')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'staff' }, () => loadAll())
+    .subscribe();
+
+  loadAll();
+  setInterval(loadAll, 30000); // Backup refresh every 30s
+
+  function renderDashboard() {
+    const today = todayStr();
+    const pending = allPOs.filter(p => p.status === 'pending');
+    const arrived = allPOs.filter(p => p.status === 'arrived');
+    const received = allPOs.filter(p => p.status === 'received' && p.received_date === today);
+
+    const sumKoli = arr => arr.reduce((s,p) => s + (p.koli||0), 0);
+    const sumAmount = arr => arr.reduce((s,p) => s + (p.amount||0), 0);
+
+    document.getElementById('s-pending').textContent = pending.length;
+    document.getElementById('s-pending-koli').textContent = sumKoli(pending).toLocaleString('id-ID');
+    document.getElementById('s-pending-nominal').textContent = formatRp(sumAmount(pending));
+    document.getElementById('s-arrived').textContent = arrived.length;
+    document.getElementById('s-arrived-koli').textContent = sumKoli(arrived).toLocaleString('id-ID');
+    document.getElementById('s-arrived-nominal').textContent = formatRp(sumAmount(arrived));
+    document.getElementById('s-received').textContent = received.length;
+    document.getElementById('s-received-koli').textContent = sumKoli(received).toLocaleString('id-ID');
+    document.getElementById('s-received-nominal').textContent = formatRp(sumAmount(received));
+
+    const staffStats = {};
+    allStaff.forEach(s => { staffStats[s.name] = { count: 0, koli: 0, amount: 0, active: true }; });
+    received.forEach(p => {
+      const name = p.received_by || '(unknown)';
+      if (!staffStats[name]) staffStats[name] = { count: 0, koli: 0, amount: 0, active: false };
+      staffStats[name].count++;
+      staffStats[name].koli += (p.koli || 0);
+      staffStats[name].amount += (p.amount || 0);
+    });
+
+    const staffArr = Object.entries(staffStats);
+    const activeCount = staffArr.filter(([_, s]) => s.count > 0).length;
+    const maxCount = Math.max(...staffArr.map(([_, s]) => s.count), 0);
+    document.getElementById('meta-staff').textContent = `${activeCount} / ${allStaff.length} aktif`;
+    staffArr.sort((a, b) => b[1].count - a[1].count);
+
+    const grid = document.getElementById('staff-grid');
+    if (staffArr.length === 0) {
+      grid.innerHTML = '<div class="empty" style="grid-column:1/-1">Belum ada karyawan. Tambahkan di halaman Admin.</div>';
+    } else {
+      grid.innerHTML = staffArr.map(([name, s]) => {
+        const isZero = s.count === 0;
+        const isTop = s.count > 0 && s.count === maxCount;
+        const cardCls = isTop ? 'top' : isZero ? 'zero' : 'act';
+        const numCls = isTop ? 't' : isZero ? 'z' : 'a';
+        const stCls = isTop ? 't' : isZero ? 'z' : 'a';
+        const stTxt = isTop ? '👑 TOP' : isZero ? 'NOL' : 'AKTIF';
+        const dotEx = !s.active ? ' <span style="color:#94a3b8; font-size:9px;">(ex)</span>' : '';
+        return `<div class="emp ${cardCls}">
+          <div class="emp-head">
+            <div class="emp-ini" style="background:${avatarColor(name)}">${esc(initials(name))}</div>
+            <div><div class="emp-n">${esc(name)}${dotEx}</div><div class="emp-st ${stCls}">${stTxt}</div></div>
+          </div>
+          <div class="emp-row">
+            <div class="emp-num ${numCls}">${s.count}</div>
+            <div class="emp-d"><strong>${s.koli.toLocaleString('id-ID')} koli</strong>${formatRp(s.amount)}</div>
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    const merged = [...arrived, ...pending];
+    document.getElementById('meta-merged').textContent = `${merged.length} PO`;
+    const tbl = document.getElementById('tbl-merged');
+    tbl.innerHTML = merged.length === 0
+      ? '<tr><td colspan="5" class="empty">Tidak ada PO menunggu</td></tr>'
+      : merged.map(p => {
+          const isArr = p.status === 'arrived';
+          return `<tr>
+            <td><strong>${esc(p.po_number)}</strong></td>
+            <td>${esc(p.supplier)}</td>
+            <td class="right">${(p.koli || 0).toLocaleString('id-ID')}</td>
+            <td class="right">${formatRp(p.amount)}</td>
+            <td class="right"><span class="status-badge ${isArr ? 'sb-a' : 'sb-p'}">${isArr ? '⚠ Sudah Tiba' : '🚚 Dalam Jalan'}</span></td>
+          </tr>`;
+        }).join('');
+  }
+
+  function renderRanking() {
+    const today = todayStr();
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6);
+    const cutoff = dateStr(sevenDaysAgo);
+    const stats = {};
+    allStaff.forEach(s => { stats[s.name] = { count: 0, amount: 0, active: true }; });
+    allPOs.filter(p => p.status === 'received' && p.received_date === today).forEach(p => {
+      const r = p.received_by || '(unknown)';
+      if (!stats[r]) stats[r] = { count: 0, amount: 0, active: false };
+      stats[r].count++;
+      stats[r].amount += (p.amount || 0);
+    });
+    allHistory.filter(h => h.date >= cutoff && h.date < today).forEach(h => {
+      if (h.receivers) {
+        Object.entries(h.receivers).forEach(([name, r]) => {
+          if (!stats[name]) stats[name] = { count: 0, amount: 0, active: false };
+          stats[name].count += (r.count || 0);
+          stats[name].amount += (r.amount || 0);
+        });
+      }
+    });
+    const sorted = Object.entries(stats).sort((a,b) => b[1].count - a[1].count);
+    const div = document.getElementById('ranking-list');
+    if (sorted.length === 0) { div.innerHTML = '<div class="empty">Belum ada data</div>'; return; }
+    div.innerHTML = sorted.map(([name, s], i) => {
+      const rCls = i === 0 && s.count > 0 ? 'r1' : i === 1 && s.count > 0 ? 'r2' : i === 2 && s.count > 0 ? 'r3' : 'ro';
+      const avg = (s.count / 7).toFixed(1);
+      const exTag = !s.active ? ' <span style="color:#94a3b8; font-size:11px; font-weight:400;">(mantan)</span>' : '';
+      return `<div class="rank-row">
+        <div class="rank-n ${rCls}">${i+1}</div>
+        <div class="rank-info"><div class="rank-name">${esc(name)}${exTag}</div><div class="rank-meta">Rata-rata ${avg} PO/hari · ${formatRp(s.amount)}</div></div>
+        <div class="rank-val"><div class="rank-c">${s.count}</div><div class="rank-cl">PO / 7 hari</div></div>
+      </div>`;
+    }).join('');
+  }
+
+  function renderHistory() {
+    const tbl = document.getElementById('tbl-history');
+    if (allHistory.length === 0) { tbl.innerHTML = '<tr><td colspan="5" class="empty">Belum ada arsip</td></tr>'; return; }
+    tbl.innerHTML = allHistory.map(h => `<tr>
+      <td><strong>${esc(h.date)}</strong></td>
+      <td class="right">${h.total_po}</td>
+      <td class="right">${(h.total_koli || 0).toLocaleString('id-ID')}</td>
+      <td class="right">${formatRp(h.total_amount)}</td>
+      <td class="right">${esc(h.top_performer || '-')}</td>
+    </tr>`).join('');
+  }
+</script>
+
+</body>
+</html>
