@@ -3,183 +3,235 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard Gudang Distribusi</title>
+<title>Admin Panel - Gudang Distribusi</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f8fafc; color: #0f172a; line-height: 1.5; padding: 24px; min-height: 100vh; }
-  .container { max-width: 1600px; margin: 0 auto; }
-  .header { background: linear-gradient(135deg, #1e293b 0%, #334155 100%); padding: 20px 28px; border-radius: 14px; margin-bottom: 18px; color: white; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
-  .brand { display: flex; align-items: center; gap: 14px; }
-  .logo { width: 44px; height: 44px; background: linear-gradient(135deg, #3b82f6, #06b6d4); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 800; }
-  .title { font-size: 19px; font-weight: 700; }
-  .sub { font-size: 12px; color: #cbd5e1; margin-top: 2px; display: flex; align-items: center; gap: 8px; }
-  .live-dot { width: 8px; height: 8px; background: #10b981; border-radius: 50%; animation: pulse 2s infinite; }
-  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
-  .right-info { display: flex; align-items: center; gap: 20px; }
-  .time-l { font-size: 10px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1.5px; }
-  .time-v { font-size: 22px; font-weight: 700; font-family: 'Courier New', monospace; color: #fbbf24; }
-  .nav-btn { background: white; color: #1e293b; padding: 10px 16px; border-radius: 8px; text-decoration: none; font-size: 13px; font-weight: 600; }
-  .nav-btn:hover { background: #f1f5f9; }
+  .container { max-width: 1200px; margin: 0 auto; }
+  .header { background: linear-gradient(135deg, #1e293b 0%, #334155 100%); padding: 18px 24px; border-radius: 14px; margin-bottom: 18px; color: white; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
+  .brand { display: flex; align-items: center; gap: 12px; }
+  .logo { width: 40px; height: 40px; background: linear-gradient(135deg, #ef4444, #f97316); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 800; }
+  .title { font-size: 17px; font-weight: 700; }
+  .sub { font-size: 12px; color: #cbd5e1; }
+  .right-info { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .user-box { text-align: right; font-size: 12px; color: #cbd5e1; }
+  .user-box strong { display: block; font-size: 14px; color: white; }
+  .user-box a { color: #fbbf24; font-size: 11px; cursor: pointer; }
+  .nav-btn { background: white; color: #1e293b; padding: 8px 14px; border-radius: 8px; text-decoration: none; font-size: 13px; font-weight: 600; }
   .tabs { display: flex; gap: 6px; margin-bottom: 18px; flex-wrap: wrap; }
-  .tab-btn { padding: 10px 18px; font-size: 13px; border: 1px solid #e2e8f0; background: white; border-radius: 8px; cursor: pointer; color: #64748b; font-family: inherit; font-weight: 600; }
+  .tab-btn { padding: 10px 18px; font-size: 13px; border: 1px solid #e2e8f0; background: white; border-radius: 8px; cursor: pointer; color: #64748b; font-weight: 600; font-family: inherit; }
   .tab-btn.active { background: #1e293b; color: white; border-color: #1e293b; }
+  .tab-btn:disabled { opacity: 0.5; cursor: not-allowed; }
   .pane { display: none; }
   .pane.active { display: block; }
-  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 18px; }
-  .stat { background: white; border-radius: 12px; padding: 18px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); position: relative; overflow: hidden; }
-  .stat::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; }
-  .stat.b::before { background: linear-gradient(180deg, #3b82f6, #06b6d4); }
-  .stat.w::before { background: linear-gradient(180deg, #f59e0b, #f97316); }
-  .stat.g::before { background: linear-gradient(180deg, #10b981, #059669); }
-  .stat-row { display: flex; justify-content: space-between; align-items: flex-start; }
-  .stat-l { font-size: 11px; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
-  .stat-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
-  .stat.b .stat-icon { background: #dbeafe; }
-  .stat.w .stat-icon { background: #fef3c7; }
-  .stat.g .stat-icon { background: #d1fae5; }
-  .stat-v { font-size: 32px; font-weight: 800; margin: 6px 0; letter-spacing: -1px; }
-  .stat-sub { font-size: 12px; color: #94a3b8; }
-  .card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); margin-bottom: 16px; }
-  .ch { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid #e2e8f0; }
-  .ch-t { font-size: 15px; font-weight: 700; color: #1e293b; }
-  .ch-m { font-size: 12px; color: #64748b; background: #f1f5f9; padding: 5px 12px; border-radius: 6px; font-weight: 600; }
-  .staff-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; }
-  .emp { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px; transition: all 0.2s; }
-  .emp.act { background: #f0fdf4; border-color: #86efac; border-left: 3px solid #10b981; }
-  .emp.top { background: linear-gradient(135deg, #fef3c7, #fef9e8); border: 2px solid #fbbf24; }
-  .emp.zero { background: #f1f5f9; opacity: 0.75; }
-  .emp-head { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
-  .emp-ini { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; color: white; flex-shrink: 0; }
-  .emp-n { font-size: 13px; font-weight: 700; color: #1e293b; word-break: break-word; }
-  .emp-st { font-size: 9px; font-weight: 800; padding: 2px 6px; border-radius: 4px; margin-top: 2px; display: inline-block; letter-spacing: 0.5px; }
-  .emp-st.a { background: #10b981; color: white; }
-  .emp-st.t { background: #d97706; color: white; }
-  .emp-st.z { background: #cbd5e1; color: #475569; }
-  .emp-row { display: flex; justify-content: space-between; align-items: flex-end; gap: 8px; }
-  .emp-num { font-size: 30px; font-weight: 900; line-height: 1; letter-spacing: -1.5px; }
-  .emp-num.a { color: #10b981; }
-  .emp-num.t { color: #d97706; }
-  .emp-num.z { color: #cbd5e1; }
-  .emp-d { font-size: 11px; color: #64748b; text-align: right; }
-  .emp-d strong { color: #1e293b; display: block; font-size: 12px; }
-  table { width: 100%; font-size: 13px; border-collapse: collapse; }
-  th { color: #64748b; font-size: 10px; padding: 10px 8px; text-align: left; text-transform: uppercase; letter-spacing: 1px; background: #f8fafc; font-weight: 700; }
-  th:first-child { border-radius: 6px 0 0 6px; }
-  th:last-child { border-radius: 0 6px 6px 0; }
+  .card { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); margin-bottom: 16px; }
+  .ch { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; padding-bottom: 14px; border-bottom: 1px solid #e2e8f0; }
+  .ch-t { font-size: 16px; font-weight: 700; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr auto; gap: 12px; align-items: flex-end; margin-bottom: 16px; }
+  @media (max-width: 600px) { .form-row { grid-template-columns: 1fr !important; } }
+  label { display: block; font-size: 11px; color: #475569; margin-bottom: 6px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+  input, select { width: 100%; padding: 12px 14px; border: 1px solid #cbd5e1; border-radius: 8px; font-family: inherit; font-size: 14px; background: white; }
+  input:focus, select:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
+  .btn { background: #1e293b; color: white; padding: 12px 24px; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; font-family: inherit; font-size: 14px; white-space: nowrap; }
+  .btn:hover:not(:disabled) { background: #0f172a; }
+  .btn:disabled { background: #cbd5e1; cursor: not-allowed; }
+  .btn-danger { background: #ef4444; }
+  .btn-danger:hover:not(:disabled) { background: #dc2626; }
+  .btn-sm { padding: 6px 12px; font-size: 12px; margin-left: 4px; }
+  .btn-outline { background: white; color: #1e293b; border: 1px solid #cbd5e1; padding: 10px 18px; border-radius: 8px; cursor: pointer; font-family: inherit; font-size: 13px; font-weight: 600; }
+  .filter-po-btn.active { background: #1e293b !important; color: white !important; border-color: #1e293b !important; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { text-align: left; padding: 10px 8px; font-weight: 700; color: #64748b; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; background: #f8fafc; }
   td { padding: 14px 8px; border-bottom: 1px solid #f1f5f9; }
   .right { text-align: right; }
   .empty { text-align: center; padding: 40px 0; color: #94a3b8; font-style: italic; }
-  .status-badge { font-size: 11px; padding: 5px 12px; border-radius: 6px; font-weight: 700; white-space: nowrap; }
-  .sb-p { background: #dbeafe; color: #1e40af; }
-  .sb-a { background: #fef3c7; color: #92400e; }
-  .rank-row { display: flex; align-items: center; gap: 14px; padding: 14px 0; border-bottom: 1px solid #f1f5f9; }
-  .rank-row:last-child { border-bottom: none; }
-  .rank-n { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 15px; flex-shrink: 0; }
-  .r1 { background: linear-gradient(135deg, #fbbf24, #d97706); color: white; }
-  .r2 { background: linear-gradient(135deg, #cbd5e1, #94a3b8); color: white; }
-  .r3 { background: linear-gradient(135deg, #b45309, #92400e); color: white; }
-  .ro { background: #e2e8f0; color: #64748b; }
-  .rank-info { flex: 1; min-width: 0; }
-  .rank-name { font-weight: 700; font-size: 15px; color: #1e293b; word-break: break-word; }
-  .rank-meta { font-size: 12px; color: #64748b; margin-top: 2px; }
-  .rank-val { text-align: right; flex-shrink: 0; }
-  .rank-c { font-size: 22px; font-weight: 800; color: #1e293b; }
-  .rank-cl { font-size: 11px; color: #94a3b8; }
-  .loading { text-align: center; padding: 60px 20px; color: #94a3b8; }
-  .spinner { display: inline-block; width: 32px; height: 32px; border: 3px solid #e2e8f0; border-top-color: #3b82f6; border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 12px; }
-  @keyframes spin { to { transform: rotate(360deg); } }
+  .staff-ini { width: 32px; height: 32px; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; color: white; vertical-align: middle; margin-right: 8px; }
+  .pin-display { font-family: 'Courier New', monospace; background: #f1f5f9; padding: 4px 10px; border-radius: 4px; font-weight: 700; letter-spacing: 2px; }
+  .role-badge { font-size: 10px; padding: 3px 8px; border-radius: 4px; font-weight: 800; letter-spacing: 0.5px; }
+  .role-owner { background: #fbbf24; color: white; }
+  .role-supervisor { background: #3b82f6; color: white; }
+  .login-bg { min-height: calc(100vh - 48px); display: flex; align-items: center; justify-content: center; }
+  .login-card { max-width: 420px; width: 100%; background: white; border-radius: 16px; padding: 36px 32px; box-shadow: 0 10px 40px rgba(0,0,0,0.08); text-align: center; }
+  .login-logo { width: 56px; height: 56px; background: linear-gradient(135deg, #ef4444, #f97316); border-radius: 14px; margin: 0 auto 16px; display: flex; align-items: center; justify-content: center; font-size: 26px; font-weight: 800; color: white; }
+  .login-title { font-size: 22px; font-weight: 800; margin-bottom: 6px; }
+  .login-sub { font-size: 13px; color: #64748b; margin-bottom: 24px; }
+  .login-form input { margin-bottom: 12px; text-align: left; }
+  .login-form label { text-align: left; }
+  .err-msg { color: #ef4444; font-size: 12px; margin-top: 8px; }
+  .toast { position: fixed; bottom: 30px; right: 30px; background: #10b981; color: white; padding: 14px 22px; border-radius: 8px; font-size: 14px; font-weight: 600; opacity: 0; transform: translateY(20px); transition: all 0.3s; pointer-events: none; z-index: 200; box-shadow: 0 8px 24px rgba(0,0,0,0.2); }
+  .toast.show { opacity: 1; transform: translateY(0); }
+  .toast.err { background: #ef4444; }
+  .info-box { background: #dbeafe; border-left: 4px solid #3b82f6; padding: 12px 16px; border-radius: 8px; font-size: 13px; color: #1e40af; margin-bottom: 16px; }
+  .warning-box { background: #fef3c7; border-left: 4px solid #f59e0b; padding: 12px 16px; border-radius: 8px; font-size: 13px; color: #92400e; margin-bottom: 16px; }
   .config-warning { background: #fee2e2; border: 1px solid #ef4444; color: #991b1b; padding: 16px 20px; border-radius: 12px; margin-bottom: 16px; font-size: 13px; }
-  @media (max-width: 768px) { body { padding: 12px; } .stat-v { font-size: 24px; } .stats { grid-template-columns: 1fr; } .staff-grid { grid-template-columns: repeat(2, 1fr); } }
+  .modal-bg { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 100; padding: 20px; }
+  .modal-bg.show { display: flex; }
+  .modal { background: white; border-radius: 12px; padding: 24px; max-width: 420px; width: 100%; }
+  .modal h3 { margin-bottom: 8px; font-size: 18px; }
+  .modal p { font-size: 13px; color: #64748b; margin-bottom: 16px; }
+  .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px; }
+  .confirm-modal h3 { color: #ef4444; }
 </style>
 </head>
 <body>
 
-<div class="container">
-
-<div class="header">
-  <div class="brand">
-    <div class="logo">G</div>
-    <div>
-      <div class="title">Gudang Distribusi</div>
-      <div class="sub"><span class="live-dot"></span> Live · <span id="header-time">Memuat...</span></div>
+<div id="login-view" class="container login-bg">
+  <div class="login-card">
+    <div class="login-logo">⚙</div>
+    <div class="login-title">Admin Panel</div>
+    <div class="login-sub">Khusus owner & supervisor</div>
+    <div id="config-warning-login"></div>
+    <div class="login-form">
+      <label>Username</label>
+      <input type="text" id="admin-user" placeholder="username" autofocus autocomplete="username">
+      <label>Password</label>
+      <input type="password" id="admin-pass" placeholder="password" autocomplete="current-password">
+      <div class="err-msg" id="login-err" style="display:none;">Username atau password salah</div>
+      <button class="btn" id="btn-login" style="width:100%; margin-top:12px;" onclick="doAdminLogin()">Masuk</button>
+    </div>
+    <div style="margin-top:20px; font-size:11px; color:#94a3b8;">
+      Belum ada admin? <a href="#" onclick="firstSetup(); return false;" style="color:#3b82f6;">Setup admin pertama</a>
     </div>
   </div>
+</div>
+
+<div id="app-view" class="container" style="display: none;">
+<div class="header">
+  <div class="brand">
+    <div class="logo">⚙</div>
+    <div><div class="title">Admin Panel</div><div class="sub" id="header-time">Memuat...</div></div>
+  </div>
   <div class="right-info">
-    <div>
-      <div class="time-l">Auto Reset</div>
-      <div class="time-v" id="countdown">--:--:--</div>
-    </div>
-    <a href="input.html" class="nav-btn">📝 Input</a>
-    <a href="admin.html" class="nav-btn">⚙️ Admin</a>
+    <div class="user-box">Login sebagai<strong id="user-name">-</strong><a href="#" onclick="logout(); return false;">Keluar</a></div>
+    <a href="index.html" class="nav-btn">📊 Dashboard</a>
   </div>
 </div>
 
 <div id="config-warning"></div>
 
 <div class="tabs">
-  <button class="tab-btn active" data-tab="main">Tracking Utama</button>
-  <button class="tab-btn" data-tab="ranking">Ranking 7 Hari</button>
-  <button class="tab-btn" data-tab="history">Arsip History</button>
+  <button class="tab-btn active" data-tab="staff">👥 Kelola Karyawan</button>
+  <button class="tab-btn" data-tab="admins">🔐 Kelola Admin</button>
+  <button class="tab-btn" data-tab="pos">📦 Kelola PO</button>
 </div>
 
-<div class="pane active" id="pane-main">
-  <div class="stats">
-    <div class="stat b"><div class="stat-row"><div><div class="stat-l">Belum Sampai</div><div class="stat-v" id="s-pending">0</div><div class="stat-sub"><span id="s-pending-koli">0</span> koli · <span id="s-pending-nominal">Rp 0</span></div></div><div class="stat-icon">🚚</div></div></div>
-    <div class="stat w"><div class="stat-row"><div><div class="stat-l">Belum Receive</div><div class="stat-v" id="s-arrived">0</div><div class="stat-sub"><span id="s-arrived-koli">0</span> koli · <span id="s-arrived-nominal">Rp 0</span></div></div><div class="stat-icon">⏰</div></div></div>
-    <div class="stat g"><div class="stat-row"><div><div class="stat-l">Sudah Receive Hari Ini</div><div class="stat-v" id="s-received">0</div><div class="stat-sub"><span id="s-received-koli">0</span> koli · <span id="s-received-nominal">Rp 0</span></div></div><div class="stat-icon">✅</div></div></div>
-  </div>
-
+<div class="pane active" id="pane-staff">
   <div class="card">
-    <div class="ch"><div class="ch-t">👥 Performance Tim Hari Ini</div><div class="ch-m" id="meta-staff">Memuat...</div></div>
-    <div class="staff-grid" id="staff-grid"><div class="loading" style="grid-column:1/-1;"><div class="spinner"></div><div>Memuat data karyawan...</div></div></div>
+    <div class="ch"><div class="ch-t">Tambah Karyawan Baru</div></div>
+    <div class="info-box">💡 PIN 4-6 angka. Tiap karyawan harus punya PIN berbeda.</div>
+    <div class="form-row">
+      <div><label>Nama Karyawan</label><input type="text" id="staff-name" placeholder="Budi Santoso" maxlength="50"></div>
+      <div><label>PIN (4-6 angka)</label><input type="text" id="staff-pin" placeholder="1234" maxlength="6" inputmode="numeric" autocomplete="off"></div>
+      <button class="btn" id="btn-add-staff" onclick="addStaff()">+ Tambah</button>
+    </div>
   </div>
-
   <div class="card">
-    <div class="ch"><div class="ch-t">📦 Daftar Barang Aktif</div><div class="ch-m" id="meta-merged">0 PO</div></div>
+    <div class="ch"><div class="ch-t">Daftar Karyawan</div><div style="font-size:12px; color:#64748b;" id="staff-count">Memuat...</div></div>
     <table>
-      <thead><tr><th>No. PO</th><th>Supplier</th><th class="right">Koli</th><th class="right">Nominal</th><th class="right">Status</th></tr></thead>
-      <tbody id="tbl-merged"><tr><td colspan="5" class="loading"><div class="spinner"></div><div>Memuat data PO...</div></td></tr></tbody>
+      <thead><tr><th>Nama</th><th>PIN</th><th class="right">Aksi</th></tr></thead>
+      <tbody id="tbl-staff"><tr><td colspan="3" class="empty">Memuat...</td></tr></tbody>
     </table>
   </div>
 </div>
 
-<div class="pane" id="pane-ranking">
+<div class="pane" id="pane-admins">
   <div class="card">
-    <div class="ch"><div class="ch-t">🏆 Ranking 7 Hari Terakhir</div><div class="ch-m">Berdasarkan total PO di-receive</div></div>
-    <div id="ranking-list"></div>
+    <div class="ch"><div class="ch-t">Tambah Admin Baru</div></div>
+    <div class="warning-box">⚠️ <strong>Owner</strong> akses penuh. <strong>Supervisor</strong> hanya kelola karyawan.</div>
+    <div class="form-row" style="grid-template-columns: 1fr 1fr 1fr auto;">
+      <div><label>Username</label><input type="text" id="adm-user" placeholder="username" maxlength="30"></div>
+      <div><label>Password</label><input type="password" id="adm-pass" placeholder="min 6 karakter" maxlength="50" autocomplete="new-password"></div>
+      <div><label>Role</label><select id="adm-role"><option value="supervisor">Supervisor</option><option value="owner">Owner</option></select></div>
+      <button class="btn" id="btn-add-admin" onclick="addAdmin()">+ Tambah</button>
+    </div>
   </div>
-</div>
-
-<div class="pane" id="pane-history">
   <div class="card">
-    <div class="ch"><div class="ch-t">📅 Arsip History Harian</div><div class="ch-m">Tersimpan otomatis tiap 00:00</div></div>
+    <div class="ch"><div class="ch-t">Daftar Admin</div><div style="font-size:12px; color:#64748b;" id="admin-count">Memuat...</div></div>
     <table>
-      <thead><tr><th>Tanggal</th><th class="right">Total PO</th><th class="right">Total Koli</th><th class="right">Nominal</th><th class="right">Top Performer</th></tr></thead>
-      <tbody id="tbl-history"></tbody>
+      <thead><tr><th>Username</th><th>Role</th><th class="right">Aksi</th></tr></thead>
+      <tbody id="tbl-admin"><tr><td colspan="3" class="empty">Memuat...</td></tr></tbody>
     </table>
   </div>
 </div>
 
+<div class="pane" id="pane-pos">
+  <div class="card">
+    <div class="ch"><div class="ch-t">Hapus PO yang Sudah Di-Receive</div></div>
+    <div class="warning-box">⚠️ Hapus PO permanen menghilangkannya dari dashboard. Data ringkasan tetap ada di Arsip History.</div>
+    <div class="filter-bar" style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px;">
+      <button class="btn-outline filter-po-btn active" data-pofilter="all">Semua</button>
+      <button class="btn-outline filter-po-btn" data-pofilter="today">Hari Ini</button>
+      <button class="btn-outline filter-po-btn" data-pofilter="week">7 Hari Terakhir</button>
+      <button class="btn-outline filter-po-btn" data-pofilter="month">30 Hari Terakhir</button>
+      <button class="btn-outline filter-po-btn" data-pofilter="older">Lebih Dari 30 Hari</button>
+    </div>
+    <div style="margin-bottom:16px;">
+      <button class="btn btn-danger" id="btn-bulk-delete" onclick="bulkDeletePOs()" disabled>🗑 Hapus Semua yang Difilter (0)</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="ch"><div class="ch-t">Daftar PO Sudah Receive</div><div style="font-size:12px; color:#64748b;" id="po-count">Memuat...</div></div>
+    <table>
+      <thead><tr><th>No. PO</th><th>Supplier</th><th class="right">Koli</th><th class="right">Nominal</th><th>Receiver</th><th>Tanggal</th><th class="right">Aksi</th></tr></thead>
+      <tbody id="tbl-pos"><tr><td colspan="7" class="empty">Memuat...</td></tr></tbody>
+    </table>
+  </div>
 </div>
+</div>
+
+<div class="modal-bg" id="modal-edit">
+  <div class="modal">
+    <h3 id="modal-title">Edit</h3>
+    <p id="modal-desc">.</p>
+    <label id="modal-label">Nilai baru</label>
+    <input type="text" id="modal-input" autocomplete="off">
+    <div class="err-msg" id="modal-err" style="display:none;"></div>
+    <div class="modal-actions">
+      <button class="btn-outline" onclick="closeModal()">Batal</button>
+      <button class="btn" id="modal-save-btn" onclick="confirmModal()">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-bg" id="modal-confirm">
+  <div class="modal confirm-modal">
+    <h3>⚠️ Konfirmasi Hapus</h3>
+    <p id="confirm-desc">.</p>
+    <label>Ketik <strong id="confirm-keyword">HAPUS</strong> untuk konfirmasi:</label>
+    <input type="text" id="confirm-input" autocomplete="off">
+    <div class="modal-actions">
+      <button class="btn-outline" onclick="closeConfirmModal()">Batal</button>
+      <button class="btn btn-danger" id="confirm-btn" onclick="executeConfirm()">Hapus</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
 
 <script type="module">
   import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
   // ============================================
-  // PASTE SUPABASE CONFIG DISINI
+  // PASTE SUPABASE CONFIG DISINI (sama persis kayak file lainnya)
   // ============================================
   const SUPABASE_URL = 'https://gpvahzvocznsftkreedc.supabase.co';
   const SUPABASE_KEY = 'sb_publishable_Fij0uvdbPkVuMJOm1Sglbg_am-ChLgm';
   // ============================================
 
-  if (SUPABASE_URL === 'PLACEHOLDER_URL') {
-    document.getElementById('config-warning').innerHTML = 
-      '<div class="config-warning"><strong>⚠️ Supabase belum dikonfigurasi!</strong><br>Edit file ini, paste SUPABASE_URL dan SUPABASE_KEY dari Supabase Dashboard.</div>';
+  const configMissing = SUPABASE_URL === 'PLACEHOLDER_URL';
+  if (configMissing) {
+    const warning = '<div class="config-warning"><strong>⚠️ Supabase belum dikonfigurasi!</strong></div>';
+    document.getElementById('config-warning').innerHTML = warning;
+    document.getElementById('config-warning-login').innerHTML = warning;
+    document.getElementById('btn-login').disabled = true;
   }
 
   const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-  let allPOs = [], allHistory = [], allStaff = [];
+  let currentAdmin = null;
+  let allStaff = [], allAdmins = [], allPOs = [];
+  let modalCallback = null, confirmCallback = null;
+  let currentPOFilter = 'all';
 
   function esc(str) {
     if (str == null) return '';
@@ -206,77 +258,130 @@
     const d = new Date();
     return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
   }
-  function dateStr(d) {
-    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  function getFilteredPOs() {
+    const today = todayStr();
+    const now = new Date();
+    const weekAgo = new Date(now); weekAgo.setDate(now.getDate() - 7);
+    const monthAgo = new Date(now); monthAgo.setDate(now.getDate() - 30);
+    const weekStr = `${weekAgo.getFullYear()}-${String(weekAgo.getMonth()+1).padStart(2,'0')}-${String(weekAgo.getDate()).padStart(2,'0')}`;
+    const monthStr = `${monthAgo.getFullYear()}-${String(monthAgo.getMonth()+1).padStart(2,'0')}-${String(monthAgo.getDate()).padStart(2,'0')}`;
+    
+    if (currentPOFilter === 'today') return allPOs.filter(p => p.received_date === today);
+    if (currentPOFilter === 'week') return allPOs.filter(p => p.received_date >= weekStr);
+    if (currentPOFilter === 'month') return allPOs.filter(p => p.received_date >= monthStr);
+    if (currentPOFilter === 'older') return allPOs.filter(p => p.received_date < monthStr);
+    return allPOs;
+  }
+  function showToast(msg, err = false) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast show' + (err ? ' err' : '');
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  window.firstSetup = async function() {
+    if (configMissing) return showToast('Supabase belum dikonfigurasi', true);
+    try {
+      const { data: existing } = await supabase.from('admins').select('id').limit(1);
+      if (existing && existing.length > 0) {
+        return showToast('Sudah ada admin terdaftar. Login dengan akun yang ada.', true);
+      }
+      const username = prompt('Buat username admin pertama (owner):');
+      if (!username || username.trim().length < 3) return showToast('Username minimal 3 karakter', true);
+      const password = prompt('Buat password (min 6 karakter):');
+      if (!password || password.length < 6) return showToast('Password minimal 6 karakter', true);
+      const { error } = await supabase.from('admins').insert({
+        username: username.trim(), password: password, role: 'owner'
+      });
+      if (error) throw error;
+      showToast('✓ Owner berhasil dibuat. Silakan login.');
+    } catch (e) { showToast('Gagal: ' + e.message, true); }
+  };
+
+  window.doAdminLogin = async function() {
+    if (configMissing) return;
+    const user = document.getElementById('admin-user').value.trim();
+    const pass = document.getElementById('admin-pass').value;
+    if (!user || !pass) return;
+    document.getElementById('btn-login').disabled = true;
+    document.getElementById('btn-login').textContent = '⏳ Login...';
+    try {
+      const { data, error } = await supabase.from('admins').select('*').ilike('username', user);
+      if (error) throw error;
+      const found = data.find(a => a.password === pass);
+      if (!found) {
+        document.getElementById('login-err').style.display = 'block';
+        document.getElementById('admin-pass').value = '';
+        document.getElementById('admin-pass').focus();
+        return;
+      }
+      currentAdmin = { id: found.id, username: found.username, role: found.role };
+      sessionStorage.setItem('admin_session', JSON.stringify(currentAdmin));
+      showApp();
+    } catch (e) {
+      showToast('Login error: ' + e.message, true);
+    } finally {
+      document.getElementById('btn-login').disabled = false;
+      document.getElementById('btn-login').textContent = 'Masuk';
+    }
+  };
+
+  document.getElementById('admin-pass').addEventListener('keypress', e => { if (e.key === 'Enter') doAdminLogin(); });
+  document.getElementById('admin-user').addEventListener('keypress', e => { if (e.key === 'Enter') document.getElementById('admin-pass').focus(); });
+
+  window.logout = function() {
+    sessionStorage.removeItem('admin_session');
+    location.reload();
+  };
+
+  async function checkExistingSession() {
+    const stored = sessionStorage.getItem('admin_session');
+    if (!stored) return false;
+    try {
+      const parsed = JSON.parse(stored);
+      const { data } = await supabase.from('admins').select('*').eq('id', parsed.id).single();
+      if (!data) {
+        sessionStorage.removeItem('admin_session');
+        return false;
+      }
+      currentAdmin = { id: data.id, username: data.username, role: data.role };
+      sessionStorage.setItem('admin_session', JSON.stringify(currentAdmin));
+      return true;
+    } catch {
+      sessionStorage.removeItem('admin_session');
+      return false;
+    }
+  }
+
+  function showApp() {
+    document.getElementById('login-view').style.display = 'none';
+    document.getElementById('app-view').style.display = 'block';
+    document.getElementById('user-name').textContent = `${currentAdmin.username} (${currentAdmin.role})`;
+    const adminTab = document.querySelector('[data-tab="admins"]');
+    if (currentAdmin.role !== 'owner') {
+      adminTab.disabled = true;
+      adminTab.title = 'Hanya owner';
+    }
+    startApp();
+  }
+
+  if (!configMissing) {
+    checkExistingSession().then(valid => { if (valid) showApp(); });
   }
 
   function updateClock() {
     const now = new Date();
     const hari = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'][now.getDay()];
     const bulan = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'][now.getMonth()];
-    document.getElementById('header-time').textContent = `${hari}, ${now.getDate()} ${bulan} ${now.getFullYear()} · ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')} WIB`;
-    const midnight = new Date(now);
-    midnight.setHours(24, 0, 0, 0);
-    const diff = midnight - now;
-    const h = Math.floor(diff / 3600000);
-    const m = Math.floor((diff % 3600000) / 60000);
-    const s = Math.floor((diff % 60000) / 1000);
-    document.getElementById('countdown').textContent = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    const sub = document.getElementById('header-time');
+    if (sub) sub.textContent = `${hari}, ${now.getDate()} ${bulan} ${now.getFullYear()} · ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')} WIB`;
   }
   setInterval(updateClock, 1000);
   updateClock();
 
-  // === Archive yesterday's data (atomic via UPSERT) ===
-  let archiving = false;
-  async function checkAndArchive() {
-    if (archiving) return;
-    archiving = true;
-    try {
-      const today = todayStr();
-      const datesToArchive = new Set();
-      allPOs.forEach(p => {
-        if (p.status === 'received' && p.received_date && p.received_date !== today) {
-          datesToArchive.add(p.received_date);
-        }
-      });
-      for (const date of datesToArchive) {
-        // Check if archive already exists for this date
-        const { data: existing } = await supabase.from('history').select('date').eq('date', date).maybeSingle();
-        if (existing) continue;
-        
-        const dayPOs = allPOs.filter(p => p.status === 'received' && p.received_date === date);
-        if (dayPOs.length === 0) continue;
-        
-        const tKoli = dayPOs.reduce((s, p) => s + (p.koli || 0), 0);
-        const tAmount = dayPOs.reduce((s, p) => s + (p.amount || 0), 0);
-        const receivers = {};
-        dayPOs.forEach(p => {
-          const r = p.received_by || '(unknown)';
-          if (!receivers[r]) receivers[r] = { count: 0, koli: 0, amount: 0 };
-          receivers[r].count++;
-          receivers[r].koli += (p.koli || 0);
-          receivers[r].amount += (p.amount || 0);
-        });
-        const top = Object.entries(receivers).sort((a,b) => b[1].count - a[1].count)[0];
-        
-        await supabase.from('history').upsert({
-          date: date,
-          total_po: dayPOs.length,
-          total_koli: tKoli,
-          total_amount: tAmount,
-          top_performer: top ? `${top[0]} (${top[1].count})` : '-',
-          receivers: receivers
-        }, { onConflict: 'date' });
-      }
-    } catch (e) {
-      console.error('Archive error:', e);
-    } finally {
-      archiving = false;
-    }
-  }
-
   document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.addEventListener('click', () => {
+      if (btn.disabled) return;
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       document.querySelectorAll('.pane').forEach(p => p.classList.remove('active'));
       btn.classList.add('active');
@@ -284,161 +389,340 @@
     });
   });
 
-  // === LOAD DATA ===
-  async function loadAll() {
-    const [pos, hist, staff] = await Promise.all([
-      supabase.from('pos').select('*').order('created_at', { ascending: false }),
-      supabase.from('history').select('*').order('date', { ascending: false }),
-      supabase.from('staff').select('*').order('name')
-    ]);
-    if (pos.data) allPOs = pos.data;
-    if (hist.data) allHistory = hist.data;
-    if (staff.data) allStaff = staff.data;
-    renderDashboard();
-    renderRanking();
-    renderHistory();
-    checkAndArchive();
+  async function loadStaff() {
+    const { data, error } = await supabase.from('staff').select('*').order('name');
+    if (error) { showToast('Gagal load karyawan', true); return; }
+    allStaff = data || [];
+    renderStaff();
+  }
+  async function loadAdmins() {
+    const { data, error } = await supabase.from('admins').select('*');
+    if (error) { showToast('Gagal load admin', true); return; }
+    allAdmins = data || [];
+    renderAdmins();
   }
 
-  // === REAL-TIME SUBSCRIPTIONS ===
-  supabase.channel('pos-changes')
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'pos' }, () => loadAll())
-    .subscribe();
-  supabase.channel('history-changes')
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'history' }, () => loadAll())
-    .subscribe();
-  supabase.channel('staff-changes')
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'staff' }, () => loadAll())
-    .subscribe();
+  async function loadPOs() {
+    const { data, error } = await supabase.from('pos').select('*').eq('status', 'received').order('received_at', { ascending: false });
+    if (error) { showToast('Gagal load PO', true); return; }
+    allPOs = data || [];
+    renderPOs();
+  }
 
-  loadAll();
-  setInterval(loadAll, 30000); // Backup refresh every 30s
+  function startApp() {
+    loadStaff();
+    loadAdmins();
+    loadPOs();
+    supabase.channel('admin-staff').on('postgres_changes', { event: '*', schema: 'public', table: 'staff' }, loadStaff).subscribe();
+    supabase.channel('admin-admins').on('postgres_changes', { event: '*', schema: 'public', table: 'admins' }, loadAdmins).subscribe();
+    supabase.channel('admin-pos').on('postgres_changes', { event: '*', schema: 'public', table: 'pos' }, loadPOs).subscribe();
+  }
 
-  function renderDashboard() {
-    const today = todayStr();
-    const pending = allPOs.filter(p => p.status === 'pending');
-    const arrived = allPOs.filter(p => p.status === 'arrived');
-    const received = allPOs.filter(p => p.status === 'received' && p.received_date === today);
-
-    const sumKoli = arr => arr.reduce((s,p) => s + (p.koli||0), 0);
-    const sumAmount = arr => arr.reduce((s,p) => s + (p.amount||0), 0);
-
-    document.getElementById('s-pending').textContent = pending.length;
-    document.getElementById('s-pending-koli').textContent = sumKoli(pending).toLocaleString('id-ID');
-    document.getElementById('s-pending-nominal').textContent = formatRp(sumAmount(pending));
-    document.getElementById('s-arrived').textContent = arrived.length;
-    document.getElementById('s-arrived-koli').textContent = sumKoli(arrived).toLocaleString('id-ID');
-    document.getElementById('s-arrived-nominal').textContent = formatRp(sumAmount(arrived));
-    document.getElementById('s-received').textContent = received.length;
-    document.getElementById('s-received-koli').textContent = sumKoli(received).toLocaleString('id-ID');
-    document.getElementById('s-received-nominal').textContent = formatRp(sumAmount(received));
-
-    const staffStats = {};
-    allStaff.forEach(s => { staffStats[s.name] = { count: 0, koli: 0, amount: 0, active: true }; });
-    received.forEach(p => {
-      const name = p.received_by || '(unknown)';
-      if (!staffStats[name]) staffStats[name] = { count: 0, koli: 0, amount: 0, active: false };
-      staffStats[name].count++;
-      staffStats[name].koli += (p.koli || 0);
-      staffStats[name].amount += (p.amount || 0);
-    });
-
-    const staffArr = Object.entries(staffStats);
-    const activeCount = staffArr.filter(([_, s]) => s.count > 0).length;
-    const maxCount = Math.max(...staffArr.map(([_, s]) => s.count), 0);
-    document.getElementById('meta-staff').textContent = `${activeCount} / ${allStaff.length} aktif`;
-    staffArr.sort((a, b) => b[1].count - a[1].count);
-
-    const grid = document.getElementById('staff-grid');
-    if (staffArr.length === 0) {
-      grid.innerHTML = '<div class="empty" style="grid-column:1/-1">Belum ada karyawan. Tambahkan di halaman Admin.</div>';
-    } else {
-      grid.innerHTML = staffArr.map(([name, s]) => {
-        const isZero = s.count === 0;
-        const isTop = s.count > 0 && s.count === maxCount;
-        const cardCls = isTop ? 'top' : isZero ? 'zero' : 'act';
-        const numCls = isTop ? 't' : isZero ? 'z' : 'a';
-        const stCls = isTop ? 't' : isZero ? 'z' : 'a';
-        const stTxt = isTop ? '👑 TOP' : isZero ? 'NOL' : 'AKTIF';
-        const dotEx = !s.active ? ' <span style="color:#94a3b8; font-size:9px;">(ex)</span>' : '';
-        return `<div class="emp ${cardCls}">
-          <div class="emp-head">
-            <div class="emp-ini" style="background:${avatarColor(name)}">${esc(initials(name))}</div>
-            <div><div class="emp-n">${esc(name)}${dotEx}</div><div class="emp-st ${stCls}">${stTxt}</div></div>
-          </div>
-          <div class="emp-row">
-            <div class="emp-num ${numCls}">${s.count}</div>
-            <div class="emp-d"><strong>${s.koli.toLocaleString('id-ID')} koli</strong>${formatRp(s.amount)}</div>
-          </div>
-        </div>`;
-      }).join('');
+  let addingStaff = false;
+  window.addStaff = async function() {
+    if (addingStaff) return;
+    const name = document.getElementById('staff-name').value.trim();
+    const pin = document.getElementById('staff-pin').value.trim();
+    if (!name) return showToast('Nama harus diisi', true);
+    if (name.length < 2) return showToast('Nama min 2 karakter', true);
+    if (!/^\d{4,6}$/.test(pin)) return showToast('PIN harus 4-6 angka', true);
+    
+    addingStaff = true;
+    document.getElementById('btn-add-staff').disabled = true;
+    document.getElementById('btn-add-staff').textContent = '⏳';
+    try {
+      if (allStaff.find(s => s.name.toLowerCase() === name.toLowerCase())) throw new Error(`Nama "${name}" sudah ada`);
+      if (allStaff.find(s => s.pin === pin)) throw new Error('PIN sudah dipakai');
+      const { error } = await supabase.from('staff').insert({ name: name, pin: pin });
+      if (error) throw error;
+      document.getElementById('staff-name').value = '';
+      document.getElementById('staff-pin').value = '';
+      document.getElementById('staff-name').focus();
+      showToast('✓ Karyawan ditambahkan');
+      await loadStaff();
+    } catch (e) {
+      showToast(e.message, true);
+    } finally {
+      addingStaff = false;
+      document.getElementById('btn-add-staff').disabled = false;
+      document.getElementById('btn-add-staff').textContent = '+ Tambah';
     }
+  };
 
-    const merged = [...arrived, ...pending];
-    document.getElementById('meta-merged').textContent = `${merged.length} PO`;
-    const tbl = document.getElementById('tbl-merged');
-    tbl.innerHTML = merged.length === 0
-      ? '<tr><td colspan="5" class="empty">Tidak ada PO menunggu</td></tr>'
-      : merged.map(p => {
-          const isArr = p.status === 'arrived';
-          return `<tr>
-            <td><strong>${esc(p.po_number)}</strong></td>
-            <td>${esc(p.supplier)}</td>
-            <td class="right">${(p.koli || 0).toLocaleString('id-ID')}</td>
-            <td class="right">${formatRp(p.amount)}</td>
-            <td class="right"><span class="status-badge ${isArr ? 'sb-a' : 'sb-p'}">${isArr ? '⚠ Sudah Tiba' : '🚚 Dalam Jalan'}</span></td>
-          </tr>`;
-        }).join('');
-  }
-
-  function renderRanking() {
-    const today = todayStr();
-    const sevenDaysAgo = new Date();
-    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6);
-    const cutoff = dateStr(sevenDaysAgo);
-    const stats = {};
-    allStaff.forEach(s => { stats[s.name] = { count: 0, amount: 0, active: true }; });
-    allPOs.filter(p => p.status === 'received' && p.received_date === today).forEach(p => {
-      const r = p.received_by || '(unknown)';
-      if (!stats[r]) stats[r] = { count: 0, amount: 0, active: false };
-      stats[r].count++;
-      stats[r].amount += (p.amount || 0);
+  window.editStaffName = function(id, oldName) {
+    openModal('Ubah Nama', `Ubah nama "${oldName}"`, 'Nama baru', oldName, async (val) => {
+      if (!val) throw new Error('Tidak boleh kosong');
+      if (val === oldName) return;
+      if (val.length < 2) throw new Error('Min 2 karakter');
+      if (allStaff.find(s => s.name.toLowerCase() === val.toLowerCase() && s.id !== id)) throw new Error('Nama sudah dipakai');
+      const { error } = await supabase.from('staff').update({ name: val }).eq('id', id);
+      if (error) throw error;
+      showToast(`✓ Nama diubah jadi "${val}"`);
+      await loadStaff();
     });
-    allHistory.filter(h => h.date >= cutoff && h.date < today).forEach(h => {
-      if (h.receivers) {
-        Object.entries(h.receivers).forEach(([name, r]) => {
-          if (!stats[name]) stats[name] = { count: 0, amount: 0, active: false };
-          stats[name].count += (r.count || 0);
-          stats[name].amount += (r.amount || 0);
-        });
-      }
-    });
-    const sorted = Object.entries(stats).sort((a,b) => b[1].count - a[1].count);
-    const div = document.getElementById('ranking-list');
-    if (sorted.length === 0) { div.innerHTML = '<div class="empty">Belum ada data</div>'; return; }
-    div.innerHTML = sorted.map(([name, s], i) => {
-      const rCls = i === 0 && s.count > 0 ? 'r1' : i === 1 && s.count > 0 ? 'r2' : i === 2 && s.count > 0 ? 'r3' : 'ro';
-      const avg = (s.count / 7).toFixed(1);
-      const exTag = !s.active ? ' <span style="color:#94a3b8; font-size:11px; font-weight:400;">(mantan)</span>' : '';
-      return `<div class="rank-row">
-        <div class="rank-n ${rCls}">${i+1}</div>
-        <div class="rank-info"><div class="rank-name">${esc(name)}${exTag}</div><div class="rank-meta">Rata-rata ${avg} PO/hari · ${formatRp(s.amount)}</div></div>
-        <div class="rank-val"><div class="rank-c">${s.count}</div><div class="rank-cl">PO / 7 hari</div></div>
-      </div>`;
-    }).join('');
-  }
+  };
 
-  function renderHistory() {
-    const tbl = document.getElementById('tbl-history');
-    if (allHistory.length === 0) { tbl.innerHTML = '<tr><td colspan="5" class="empty">Belum ada arsip</td></tr>'; return; }
-    tbl.innerHTML = allHistory.map(h => `<tr>
-      <td><strong>${esc(h.date)}</strong></td>
-      <td class="right">${h.total_po}</td>
-      <td class="right">${(h.total_koli || 0).toLocaleString('id-ID')}</td>
-      <td class="right">${formatRp(h.total_amount)}</td>
-      <td class="right">${esc(h.top_performer || '-')}</td>
+  window.editStaffPin = function(id, name) {
+    openModal('Ubah PIN', `PIN baru untuk ${name}`, 'PIN baru (4-6 angka)', '', async (val) => {
+      if (!/^\d{4,6}$/.test(val)) throw new Error('PIN harus 4-6 angka');
+      if (allStaff.find(s => s.pin === val && s.id !== id)) throw new Error('PIN sudah dipakai');
+      const { error } = await supabase.from('staff').update({ pin: val }).eq('id', id);
+      if (error) throw error;
+      showToast('✓ PIN diubah');
+      await loadStaff();
+    });
+  };
+
+  window.deleteStaff = function(id, name) {
+    openConfirmModal(`Hapus karyawan "${name}"?`, 'Data history & PO yang udah di-receive tetap tersimpan.', 'HAPUS', async () => {
+      const { error } = await supabase.from('staff').delete().eq('id', id);
+      if (error) throw error;
+      showToast(`✓ "${name}" dihapus`);
+      await loadStaff();
+    });
+  };
+
+  function renderStaff() {
+    document.getElementById('staff-count').textContent = `${allStaff.length} karyawan`;
+    const tbl = document.getElementById('tbl-staff');
+    if (allStaff.length === 0) {
+      tbl.innerHTML = '<tr><td colspan="3" class="empty">Belum ada karyawan</td></tr>';
+      return;
+    }
+    tbl.innerHTML = allStaff.map(s => `<tr>
+      <td><span class="staff-ini" style="background:${avatarColor(s.name)}">${esc(initials(s.name))}</span><strong>${esc(s.name)}</strong></td>
+      <td><span class="pin-display">${esc(s.pin)}</span></td>
+      <td class="right">
+        <button class="btn btn-sm" data-action="edit-name" data-id="${esc(s.id)}" data-name="${esc(s.name)}">✏️ Nama</button>
+        <button class="btn btn-sm" data-action="edit-pin" data-id="${esc(s.id)}" data-name="${esc(s.name)}">🔑 PIN</button>
+        <button class="btn btn-sm btn-danger" data-action="delete" data-id="${esc(s.id)}" data-name="${esc(s.name)}">🗑 Hapus</button>
+      </td>
     </tr>`).join('');
+    tbl.querySelectorAll('button[data-action]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const a = btn.dataset.action, id = btn.dataset.id, name = btn.dataset.name;
+        if (a === 'edit-name') editStaffName(id, name);
+        else if (a === 'edit-pin') editStaffPin(id, name);
+        else if (a === 'delete') deleteStaff(id, name);
+      });
+    });
   }
+
+  let addingAdmin = false;
+  window.addAdmin = async function() {
+    if (addingAdmin) return;
+    if (currentAdmin.role !== 'owner') return showToast('Hanya owner', true);
+    const user = document.getElementById('adm-user').value.trim();
+    const pass = document.getElementById('adm-pass').value;
+    const role = document.getElementById('adm-role').value;
+    if (user.length < 3) return showToast('Username min 3 karakter', true);
+    if (pass.length < 6) return showToast('Password min 6 karakter', true);
+    if (allAdmins.find(a => a.username.toLowerCase() === user.toLowerCase())) return showToast('Username sudah ada', true);
+    
+    addingAdmin = true;
+    document.getElementById('btn-add-admin').disabled = true;
+    document.getElementById('btn-add-admin').textContent = '⏳';
+    try {
+      const { error } = await supabase.from('admins').insert({ username: user, password: pass, role: role });
+      if (error) throw error;
+      document.getElementById('adm-user').value = '';
+      document.getElementById('adm-pass').value = '';
+      showToast(`✓ Admin "${user}" ditambahkan`);
+      await loadAdmins();
+    } catch (e) {
+      showToast('Gagal: ' + e.message, true);
+    } finally {
+      addingAdmin = false;
+      document.getElementById('btn-add-admin').disabled = false;
+      document.getElementById('btn-add-admin').textContent = '+ Tambah';
+    }
+  };
+
+  window.changeAdminPass = function(id, username) {
+    openModal('Ubah Password', `Password baru untuk "${username}"`, 'Password baru (min 6)', '', async (val) => {
+      if (val.length < 6) throw new Error('Min 6 karakter');
+      const { error } = await supabase.from('admins').update({ password: val }).eq('id', id);
+      if (error) throw error;
+      showToast('✓ Password diubah');
+      await loadAdmins();
+    });
+  };
+
+  window.deleteAdmin = function(id, username) {
+    if (currentAdmin.role !== 'owner') return showToast('Hanya owner', true);
+    if (id === currentAdmin.id) return showToast('Tidak bisa hapus diri sendiri', true);
+    const owners = allAdmins.filter(a => a.role === 'owner');
+    const target = allAdmins.find(a => a.id === id);
+    if (target && target.role === 'owner' && owners.length === 1) {
+      return showToast('Tidak bisa hapus owner terakhir', true);
+    }
+    openConfirmModal(`Hapus admin "${username}"?`, 'Akun ini tidak bisa login lagi.', 'HAPUS', async () => {
+      const { error } = await supabase.from('admins').delete().eq('id', id);
+      if (error) throw error;
+      showToast(`✓ "${username}" dihapus`);
+      await loadAdmins();
+    });
+  };
+
+  function renderAdmins() {
+    document.getElementById('admin-count').textContent = `${allAdmins.length} admin`;
+    const tbl = document.getElementById('tbl-admin');
+    if (!currentAdmin) return;
+    const canManage = currentAdmin.role === 'owner';
+    if (allAdmins.length === 0) {
+      tbl.innerHTML = '<tr><td colspan="3" class="empty">Belum ada admin</td></tr>';
+      return;
+    }
+    tbl.innerHTML = allAdmins.map(a => {
+      const isMe = a.id === currentAdmin.id;
+      const canChangePass = canManage || isMe;
+      const canDelete = canManage && !isMe;
+      return `<tr>
+        <td><strong>${esc(a.username)}</strong>${isMe ? ' <span style="color:#10b981; font-size:11px;">(kamu)</span>' : ''}</td>
+        <td><span class="role-badge role-${a.role}">${a.role === 'owner' ? '👑 OWNER' : '🛡 SUPERVISOR'}</span></td>
+        <td class="right">
+          ${canChangePass ? `<button class="btn btn-sm" data-action="change-pass" data-id="${esc(a.id)}" data-name="${esc(a.username)}">🔑 Password</button>` : ''}
+          ${canDelete ? `<button class="btn btn-sm btn-danger" data-action="delete-admin" data-id="${esc(a.id)}" data-name="${esc(a.username)}">🗑 Hapus</button>` : ''}
+        </td>
+      </tr>`;
+    }).join('');
+    tbl.querySelectorAll('button[data-action]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const a = btn.dataset.action, id = btn.dataset.id, name = btn.dataset.name;
+        if (a === 'change-pass') changeAdminPass(id, name);
+        else if (a === 'delete-admin') deleteAdmin(id, name);
+      });
+    });
+  }
+
+  function openModal(title, desc, label, defaultVal, callback) {
+    document.getElementById('modal-title').textContent = title;
+    document.getElementById('modal-desc').textContent = desc;
+    document.getElementById('modal-label').textContent = label;
+    document.getElementById('modal-input').value = defaultVal;
+    document.getElementById('modal-err').style.display = 'none';
+    modalCallback = callback;
+    document.getElementById('modal-edit').classList.add('show');
+    setTimeout(() => document.getElementById('modal-input').focus(), 100);
+  }
+  window.closeModal = function() { document.getElementById('modal-edit').classList.remove('show'); modalCallback = null; };
+  window.confirmModal = async function() {
+    const val = document.getElementById('modal-input').value.trim();
+    const btn = document.getElementById('modal-save-btn');
+    btn.disabled = true; btn.textContent = '⏳';
+    try {
+      if (modalCallback) await modalCallback(val);
+      closeModal();
+    } catch (e) {
+      document.getElementById('modal-err').textContent = e.message;
+      document.getElementById('modal-err').style.display = 'block';
+    } finally {
+      btn.disabled = false; btn.textContent = 'Simpan';
+    }
+  };
+  document.getElementById('modal-input').addEventListener('keypress', e => { if (e.key === 'Enter') confirmModal(); });
+
+  function openConfirmModal(title, desc, keyword, callback) {
+    document.getElementById('confirm-desc').textContent = `${title} ${desc}`;
+    document.getElementById('confirm-keyword').textContent = keyword;
+    document.getElementById('confirm-input').value = '';
+    document.getElementById('confirm-input').dataset.keyword = keyword;
+    confirmCallback = callback;
+    document.getElementById('modal-confirm').classList.add('show');
+    setTimeout(() => document.getElementById('confirm-input').focus(), 100);
+  }
+  window.closeConfirmModal = function() { document.getElementById('modal-confirm').classList.remove('show'); confirmCallback = null; };
+  window.executeConfirm = async function() {
+    const input = document.getElementById('confirm-input');
+    const keyword = input.dataset.keyword;
+    if (input.value.trim().toUpperCase() !== keyword) return showToast(`Ketik "${keyword}" persis`, true);
+    const btn = document.getElementById('confirm-btn');
+    btn.disabled = true; btn.textContent = '⏳';
+    try {
+      if (confirmCallback) await confirmCallback();
+      closeConfirmModal();
+    } catch (e) {
+      showToast('Gagal: ' + e.message, true);
+    } finally {
+      btn.disabled = false; btn.textContent = 'Hapus';
+    }
+  };
+  document.getElementById('confirm-input').addEventListener('keypress', e => { if (e.key === 'Enter') executeConfirm(); });
+  document.getElementById('staff-pin').addEventListener('input', e => { e.target.value = e.target.value.replace(/\D/g, ''); });
+
+  // === KELOLA PO ===
+  function renderPOs() {
+    const filtered = getFilteredPOs();
+    document.getElementById('po-count').textContent = `${filtered.length} dari ${allPOs.length} PO`;
+    
+    // Update bulk delete button
+    const btnBulk = document.getElementById('btn-bulk-delete');
+    btnBulk.textContent = `🗑 Hapus Semua yang Difilter (${filtered.length})`;
+    btnBulk.disabled = filtered.length === 0;
+    
+    const tbl = document.getElementById('tbl-pos');
+    if (filtered.length === 0) {
+      tbl.innerHTML = '<tr><td colspan="7" class="empty">Tidak ada PO yang sudah di-receive di filter ini</td></tr>';
+      return;
+    }
+    
+    tbl.innerHTML = filtered.map(p => `<tr>
+      <td><strong>${esc(p.po_number)}</strong></td>
+      <td>${esc(p.supplier)}</td>
+      <td class="right">${(p.koli || 0).toLocaleString('id-ID')}</td>
+      <td class="right">${formatRp(p.amount)}</td>
+      <td><strong>${esc(p.received_by || '-')}</strong></td>
+      <td>${esc(p.received_date || '-')}</td>
+      <td class="right"><button class="btn btn-sm btn-danger" data-action="delete-po" data-id="${esc(p.id)}" data-no="${esc(p.po_number)}">🗑 Hapus</button></td>
+    </tr>`).join('');
+    
+    tbl.querySelectorAll('button[data-action="delete-po"]').forEach(btn => {
+      btn.addEventListener('click', () => deletePO(btn.dataset.id, btn.dataset.no));
+    });
+  }
+
+  window.deletePO = function(id, poNumber) {
+    openConfirmModal(`Hapus PO "${poNumber}"?`, 'PO akan dihapus permanen dari dashboard. Data ringkasan tetap di Arsip History.', 'HAPUS', async () => {
+      const { error } = await supabase.from('pos').delete().eq('id', id);
+      if (error) throw error;
+      showToast(`✓ PO "${poNumber}" dihapus`);
+      await loadPOs();
+    });
+  };
+
+  window.bulkDeletePOs = function() {
+    const filtered = getFilteredPOs();
+    if (filtered.length === 0) return;
+    const filterLabel = {
+      'all': 'SEMUA',
+      'today': 'hari ini',
+      'week': '7 hari terakhir',
+      'month': '30 hari terakhir',
+      'older': 'lebih dari 30 hari'
+    }[currentPOFilter];
+    
+    openConfirmModal(
+      `Hapus ${filtered.length} PO sekaligus?`,
+      `${filtered.length} PO dari filter "${filterLabel}" akan dihapus permanen. Data ringkasan tetap ada di Arsip History.`,
+      'HAPUS SEMUA',
+      async () => {
+        const ids = filtered.map(p => p.id);
+        const { error } = await supabase.from('pos').delete().in('id', ids);
+        if (error) throw error;
+        showToast(`✓ ${filtered.length} PO dihapus`);
+        await loadPOs();
+      }
+    );
+  };
+
+  document.querySelectorAll('.filter-po-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-po-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentPOFilter = btn.dataset.pofilter;
+      renderPOs();
+    });
+  });
 </script>
 
 </body>
