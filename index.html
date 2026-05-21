@@ -3,14 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard CANGKRING</title>
+<title>Dashboard Gudang Distribusi</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f8fafc; color: #0f172a; line-height: 1.5; padding: 24px; min-height: 100vh; }
   .container { max-width: 1600px; margin: 0 auto; }
   .header { background: linear-gradient(135deg, #1e293b 0%, #334155 100%); padding: 20px 28px; border-radius: 14px; margin-bottom: 18px; color: white; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
   .brand { display: flex; align-items: center; gap: 14px; }
-  .logo { min-width: 60px; height: 44px; padding: 0 10px; background: linear-gradient(135deg, #3b82f6, #06b6d4); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 800; letter-spacing: 1px; }
+  .logo { width: 44px; height: 44px; background: linear-gradient(135deg, #3b82f6, #06b6d4); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 800; }
   .title { font-size: 19px; font-weight: 700; }
   .sub { font-size: 12px; color: #cbd5e1; margin-top: 2px; display: flex; align-items: center; gap: 8px; }
   .live-dot { width: 8px; height: 8px; background: #10b981; border-radius: 50%; animation: pulse 2s infinite; }
@@ -43,25 +43,25 @@
   .ch { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid #e2e8f0; }
   .ch-t { font-size: 15px; font-weight: 700; color: #1e293b; }
   .ch-m { font-size: 12px; color: #64748b; background: #f1f5f9; padding: 5px 12px; border-radius: 6px; font-weight: 600; }
-  .staff-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
-  .emp { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 10px; padding: 14px; transition: all 0.2s; }
-  .emp.act { background: #ecfdf5; border-color: #10b981; border-left: 4px solid #10b981; }
-  .emp.top { background: linear-gradient(135deg, #fef3c7, #fde68a); border: 2px solid #f59e0b; }
-  .emp.zero { background: #f8fafc; opacity: 0.85; }
-  .emp-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-  .emp-ini { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 900; color: white; flex-shrink: 0; }
-  .emp-n { font-size: 14px; font-weight: 800; color: #0f172a; word-break: break-word; line-height: 1.2; }
-  .emp-st { font-size: 10px; font-weight: 900; padding: 2px 7px; border-radius: 4px; margin-top: 3px; display: inline-block; letter-spacing: 0.5px; }
+  .staff-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; }
+  .emp { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px; transition: all 0.2s; }
+  .emp.act { background: #f0fdf4; border-color: #86efac; border-left: 3px solid #10b981; }
+  .emp.top { background: linear-gradient(135deg, #fef3c7, #fef9e8); border: 2px solid #fbbf24; }
+  .emp.zero { background: #f1f5f9; opacity: 0.75; }
+  .emp-head { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+  .emp-ini { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; color: white; flex-shrink: 0; }
+  .emp-n { font-size: 13px; font-weight: 700; color: #1e293b; word-break: break-word; }
+  .emp-st { font-size: 9px; font-weight: 800; padding: 2px 6px; border-radius: 4px; margin-top: 2px; display: inline-block; letter-spacing: 0.5px; }
   .emp-st.a { background: #10b981; color: white; }
   .emp-st.t { background: #d97706; color: white; }
-  .emp-st.z { background: #94a3b8; color: white; }
+  .emp-st.z { background: #cbd5e1; color: #475569; }
   .emp-row { display: flex; justify-content: space-between; align-items: flex-end; gap: 8px; }
-  .emp-num { font-size: 32px; font-weight: 900; line-height: 1; letter-spacing: -1.5px; }
-  .emp-num.a { color: #059669; }
+  .emp-num { font-size: 30px; font-weight: 900; line-height: 1; letter-spacing: -1.5px; }
+  .emp-num.a { color: #10b981; }
   .emp-num.t { color: #d97706; }
-  .emp-num.z { color: #94a3b8; }
-  .emp-d { font-size: 11px; color: #475569; text-align: right; font-weight: 600; line-height: 1.3; }
-  .emp-d strong { color: #0f172a; display: block; font-size: 12px; font-weight: 800; }
+  .emp-num.z { color: #cbd5e1; }
+  .emp-d { font-size: 11px; color: #64748b; text-align: right; }
+  .emp-d strong { color: #1e293b; display: block; font-size: 12px; }
   table { width: 100%; font-size: 13px; border-collapse: collapse; }
   th { color: #64748b; font-size: 10px; padding: 10px 8px; text-align: left; text-transform: uppercase; letter-spacing: 1px; background: #f8fafc; font-weight: 700; }
   th:first-child { border-radius: 6px 0 0 6px; }
@@ -72,11 +72,15 @@
   .status-badge { font-size: 11px; padding: 5px 12px; border-radius: 6px; font-weight: 700; white-space: nowrap; }
   .sb-p { background: #dbeafe; color: #1e40af; }
   .sb-a { background: #fef3c7; color: #92400e; }
-  .sb-r { background: #d1fae5; color: #065f46; }
-  .filter-bar { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
-  .filter-btn { padding: 8px 14px; font-size: 12px; border: 1px solid #e2e8f0; background: white; border-radius: 6px; cursor: pointer; color: #64748b; font-weight: 600; font-family: inherit; }
-  .filter-btn.active { background: #1e293b; color: white; border-color: #1e293b; }
-  .filter-btn:hover:not(.active) { background: #f1f5f9; }
+  .date-cell { font-size: 12px; color: #475569; }
+  .date-cell .date-main { font-weight: 600; color: #1e293b; }
+  .date-cell .date-dur { font-size: 11px; color: #94a3b8; margin-top: 2px; }
+  .date-cell .date-dur.warn { color: #b91c1c; font-weight: 700; }
+  .row-warn { background: #fef2f2; }
+  .row-warn:hover { background: #fee2e2; }
+  .warn-tag { display: inline-block; background: #dc2626; color: white; font-size: 9px; font-weight: 800; padding: 2px 7px; border-radius: 4px; margin-left: 6px; letter-spacing: 0.5px; vertical-align: middle; }
+  @keyframes blinkWarn { 0%,100% { opacity: 1; } 50% { opacity: 0.55; } }
+  .warn-tag { animation: blinkWarn 1.5s infinite; }
   .rank-row { display: flex; align-items: center; gap: 14px; padding: 14px 0; border-bottom: 1px solid #f1f5f9; }
   .rank-row:last-child { border-bottom: none; }
   .rank-n { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 15px; flex-shrink: 0; }
@@ -94,7 +98,7 @@
   .spinner { display: inline-block; width: 32px; height: 32px; border: 3px solid #e2e8f0; border-top-color: #3b82f6; border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 12px; }
   @keyframes spin { to { transform: rotate(360deg); } }
   .config-warning { background: #fee2e2; border: 1px solid #ef4444; color: #991b1b; padding: 16px 20px; border-radius: 12px; margin-bottom: 16px; font-size: 13px; }
-  @media (max-width: 600px) { body { padding: 12px; } .stat-v { font-size: 20px; } .stats { gap: 8px; } .stat { padding: 12px; } .stat-l { font-size: 9px; } .stat-sub { font-size: 10px; } .stat-icon { display: none; } .staff-grid { grid-template-columns: repeat(2, 1fr); } .emp { padding: 10px; } .emp-num { font-size: 24px; } }
+  @media (max-width: 768px) { body { padding: 12px; } .stat-v { font-size: 24px; } .stats { grid-template-columns: 1fr; } .staff-grid { grid-template-columns: repeat(2, 1fr); } }
 </style>
 </head>
 <body>
@@ -103,9 +107,9 @@
 
 <div class="header">
   <div class="brand">
-    <div class="logo">AWW</div>
+    <div class="logo">G</div>
     <div>
-      <div class="title">CANGKRING</div>
+      <div class="title">Gudang Distribusi</div>
       <div class="sub"><span class="live-dot"></span> Live · <span id="header-time">Memuat...</span></div>
     </div>
   </div>
@@ -131,7 +135,7 @@
   <div class="stats">
     <div class="stat b"><div class="stat-row"><div><div class="stat-l">Belum Sampai</div><div class="stat-v" id="s-pending">0</div><div class="stat-sub"><span id="s-pending-koli">0</span> koli · <span id="s-pending-nominal">Rp 0</span></div></div><div class="stat-icon">🚚</div></div></div>
     <div class="stat w"><div class="stat-row"><div><div class="stat-l">Belum Receive</div><div class="stat-v" id="s-arrived">0</div><div class="stat-sub"><span id="s-arrived-koli">0</span> koli · <span id="s-arrived-nominal">Rp 0</span></div></div><div class="stat-icon">⏰</div></div></div>
-    <div class="stat g"><div class="stat-row"><div><div class="stat-l">Total Sudah Receive</div><div class="stat-v" id="s-received">0</div><div class="stat-sub"><span id="s-received-koli">0</span> koli · <span id="s-received-nominal">Rp 0</span></div></div><div class="stat-icon">✅</div></div></div>
+    <div class="stat g"><div class="stat-row"><div><div class="stat-l">Sudah Receive Hari Ini</div><div class="stat-v" id="s-received">0</div><div class="stat-sub"><span id="s-received-koli">0</span> koli · <span id="s-received-nominal">Rp 0</span></div></div><div class="stat-icon">✅</div></div></div>
   </div>
 
   <div class="card">
@@ -140,15 +144,9 @@
   </div>
 
   <div class="card">
-    <div class="ch"><div class="ch-t">📦 Daftar Barang</div><div class="ch-m" id="meta-merged">0 PO</div></div>
-    <div class="filter-bar">
-      <button class="filter-btn active" data-filter="all">Semua</button>
-      <button class="filter-btn" data-filter="pending">🚚 Belum Sampai</button>
-      <button class="filter-btn" data-filter="arrived">⚠ Belum Receive</button>
-      <button class="filter-btn" data-filter="received">✅ Sudah Receive</button>
-    </div>
+    <div class="ch"><div class="ch-t">📦 Daftar Barang Aktif</div><div class="ch-m" id="meta-merged">0 PO</div></div>
     <table>
-      <thead><tr><th>No. PO</th><th>Supplier</th><th class="right">Koli</th><th class="right">Nominal</th><th>Receiver</th><th class="right">Status</th></tr></thead>
+      <thead><tr><th>No. PO</th><th>Supplier</th><th class="right">Koli</th><th class="right">Nominal</th><th>Tanggal</th><th class="right">Status</th></tr></thead>
       <tbody id="tbl-merged"><tr><td colspan="6" class="loading"><div class="spinner"></div><div>Memuat data PO...</div></td></tr></tbody>
     </table>
   </div>
@@ -219,6 +217,29 @@
   }
   function dateStr(d) {
     return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  }
+  // Ambil tanggal kedatangan dari berbagai kemungkinan nama field, fallback ke created_at
+  function getArrivalRaw(p) {
+    return p.arrived_date || p.arrival_date || p.arrived_at || p.tanggal_datang || p.created_at || null;
+  }
+  // Format tanggal ke gaya Indonesia singkat: "15 Mei 2026"
+  function formatTanggal(raw) {
+    if (!raw) return '-';
+    const d = new Date(raw);
+    if (isNaN(d)) return '-';
+    const bulan = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+    return `${d.getDate()} ${bulan[d.getMonth()]} ${d.getFullYear()}`;
+  }
+  // Hitung jumlah hari penuh dari tanggal tertentu sampai hari ini
+  function daysSince(raw) {
+    if (!raw) return null;
+    const d = new Date(raw);
+    if (isNaN(d)) return null;
+    const now = new Date();
+    // normalisasi ke tengah malam agar selisih dihitung per kalender hari
+    const a = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+    const b = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    return Math.round((b - a) / 86400000);
   }
 
   function updateClock() {
@@ -329,8 +350,7 @@
     const today = todayStr();
     const pending = allPOs.filter(p => p.status === 'pending');
     const arrived = allPOs.filter(p => p.status === 'arrived');
-    const receivedAll = allPOs.filter(p => p.status === 'received');
-    const receivedToday = allPOs.filter(p => p.status === 'received' && p.received_date === today);
+    const received = allPOs.filter(p => p.status === 'received' && p.received_date === today);
 
     const sumKoli = arr => arr.reduce((s,p) => s + (p.koli||0), 0);
     const sumAmount = arr => arr.reduce((s,p) => s + (p.amount||0), 0);
@@ -341,13 +361,13 @@
     document.getElementById('s-arrived').textContent = arrived.length;
     document.getElementById('s-arrived-koli').textContent = sumKoli(arrived).toLocaleString('id-ID');
     document.getElementById('s-arrived-nominal').textContent = formatRp(sumAmount(arrived));
-    document.getElementById('s-received').textContent = receivedAll.length;
-    document.getElementById('s-received-koli').textContent = sumKoli(receivedAll).toLocaleString('id-ID');
-    document.getElementById('s-received-nominal').textContent = formatRp(sumAmount(receivedAll));
+    document.getElementById('s-received').textContent = received.length;
+    document.getElementById('s-received-koli').textContent = sumKoli(received).toLocaleString('id-ID');
+    document.getElementById('s-received-nominal').textContent = formatRp(sumAmount(received));
 
     const staffStats = {};
     allStaff.forEach(s => { staffStats[s.name] = { count: 0, koli: 0, amount: 0, active: true }; });
-    receivedToday.forEach(p => {
+    received.forEach(p => {
       const name = p.received_by || '(unknown)';
       if (!staffStats[name]) staffStats[name] = { count: 0, koli: 0, amount: 0, active: false };
       staffStats[name].count++;
@@ -386,52 +406,62 @@
       }).join('');
     }
 
-    const merged = [...arrived, ...pending, ...allPOs.filter(p => p.status === 'received')];
-    document.getElementById('meta-merged').textContent = `${merged.length} PO`;
-    renderTable();
-  }
+    // Urutkan: barang sudah tiba (arrived) dulu, yang paling lama menunggu di atas
+    const arrivedSorted = [...arrived].sort((a, b) => {
+      const da = daysSince(getArrivalRaw(a)) ?? -1;
+      const db = daysSince(getArrivalRaw(b)) ?? -1;
+      return db - da;
+    });
+    const merged = [...arrivedSorted, ...pending];
 
-  let currentFilter = 'all';
-  function renderTable() {
-    const merged = [
-      ...allPOs.filter(p => p.status === 'arrived'),
-      ...allPOs.filter(p => p.status === 'pending'),
-      ...allPOs.filter(p => p.status === 'received').sort((a,b) => (b.received_at || '').localeCompare(a.received_at || ''))
-    ];
-    
-    let filtered = merged;
-    if (currentFilter !== 'all') filtered = merged.filter(p => p.status === currentFilter);
-    
-    document.getElementById('meta-merged').textContent = `${filtered.length} dari ${merged.length} PO`;
+    // Hitung berapa barang yang kena peringatan (sudah tiba > 7 hari belum receive)
+    let warnCount = 0;
+    arrived.forEach(p => {
+      const d = daysSince(getArrivalRaw(p));
+      if (d != null && d > 7) warnCount++;
+    });
+    document.getElementById('meta-merged').textContent =
+      warnCount > 0 ? `${merged.length} PO · ⚠ ${warnCount} terlambat` : `${merged.length} PO`;
+
     const tbl = document.getElementById('tbl-merged');
-    tbl.innerHTML = filtered.length === 0
-      ? '<tr><td colspan="6" class="empty">Tidak ada PO</td></tr>'
-      : filtered.map(p => {
-          let statusBadge = '';
-          if (p.status === 'received') statusBadge = '<span class="status-badge sb-r">✅ Sudah Receive</span>';
-          else if (p.status === 'arrived') statusBadge = '<span class="status-badge sb-a">⚠ Sudah Tiba</span>';
-          else statusBadge = '<span class="status-badge sb-p">🚚 Dalam Jalan</span>';
-          
-          return `<tr>
-            <td><strong>${esc(p.po_number)}</strong></td>
+    tbl.innerHTML = merged.length === 0
+      ? '<tr><td colspan="6" class="empty">Tidak ada PO menunggu</td></tr>'
+      : merged.map(p => {
+          const isArr = p.status === 'arrived';
+          const raw = getArrivalRaw(p);
+          const tgl = formatTanggal(raw);
+          const dur = daysSince(raw);
+
+          let dateLabel, durHtml = '', rowCls = '', warnTag = '';
+          if (isArr) {
+            // Barang sudah datang tapi belum di-receive
+            dateLabel = `<div class="date-main">📥 Datang: ${tgl}</div>`;
+            if (dur != null) {
+              const teks = dur === 0 ? 'Hari ini' : `${dur} hari menunggu`;
+              if (dur > 7) {
+                durHtml = `<div class="date-dur warn">⚠ ${teks}</div>`;
+                rowCls = ' class="row-warn"';
+                warnTag = '<span class="warn-tag">TERLAMBAT</span>';
+              } else {
+                durHtml = `<div class="date-dur">${teks}</div>`;
+              }
+            }
+          } else {
+            // Barang belum datang
+            dateLabel = `<div class="date-main">🚚 Input: ${tgl}</div>`;
+            if (dur != null && dur > 0) durHtml = `<div class="date-dur">${dur} hari lalu</div>`;
+          }
+
+          return `<tr${rowCls}>
+            <td><strong>${esc(p.po_number)}</strong>${warnTag}</td>
             <td>${esc(p.supplier)}</td>
             <td class="right">${(p.koli || 0).toLocaleString('id-ID')}</td>
             <td class="right">${formatRp(p.amount)}</td>
-            <td>${p.received_by ? `<strong>${esc(p.received_by)}</strong> <span style="color:#94a3b8; font-size:11px;">${esc(p.received_date || '')}</span>` : '-'}</td>
-            <td class="right">${statusBadge}</td>
+            <td class="date-cell">${dateLabel}${durHtml}</td>
+            <td class="right"><span class="status-badge ${isArr ? 'sb-a' : 'sb-p'}">${isArr ? '⚠ Sudah Tiba' : '🚚 Dalam Jalan'}</span></td>
           </tr>`;
         }).join('');
   }
-  
-  // Filter button handlers
-  document.querySelectorAll('.filter-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      currentFilter = btn.dataset.filter;
-      renderTable();
-    });
-  });
 
   function renderRanking() {
     const today = todayStr();
