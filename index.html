@@ -72,6 +72,9 @@
   .status-badge { font-size: 11px; padding: 5px 12px; border-radius: 6px; font-weight: 700; white-space: nowrap; }
   .sb-p { background: #dbeafe; color: #1e40af; }
   .sb-a { background: #fef3c7; color: #92400e; }
+  .sb-r { background: #d1fae5; color: #065f46; }
+  .row-recv { background: #f0fdf4; }
+  .row-recv:hover { background: #dcfce7; }
   .date-cell { font-size: 12px; color: #475569; }
   .date-cell .date-main { font-weight: 600; color: #1e293b; }
   .date-cell .date-dur { font-size: 11px; color: #94a3b8; margin-top: 2px; }
@@ -144,10 +147,10 @@
   </div>
 
   <div class="card">
-    <div class="ch"><div class="ch-t">📦 Daftar Barang Aktif</div><div class="ch-m" id="meta-merged">0 PO</div></div>
+    <div class="ch"><div class="ch-t">📦 Daftar Semua Barang</div><div class="ch-m" id="meta-merged">0 PO</div></div>
     <table>
-      <thead><tr><th>No. PO</th><th>Supplier</th><th class="right">Koli</th><th class="right">Nominal</th><th>Tanggal</th><th class="right">Status</th></tr></thead>
-      <tbody id="tbl-merged"><tr><td colspan="6" class="loading"><div class="spinner"></div><div>Memuat data PO...</div></td></tr></tbody>
+      <thead><tr><th>No. PO</th><th>Supplier</th><th class="right">Koli</th><th class="right">Nominal</th><th>Tanggal</th><th>Petugas</th><th class="right">Status</th></tr></thead>
+      <tbody id="tbl-merged"><tr><td colspan="7" class="loading"><div class="spinner"></div><div>Memuat data PO...</div></td></tr></tbody>
     </table>
   </div>
 </div>
@@ -414,42 +417,67 @@
     });
     const merged = [...arrivedSorted, ...pending];
 
+    // Barang sudah di-receive: tampil sampai 6 bulan setelah tanggal receive, lalu hilang
+    const recvCutoff = new Date();
+    recvCutoff.setMonth(recvCutoff.getMonth() - 6);
+    const recvCutoffStr = dateStr(recvCutoff);
+    const receivedList = allPOs
+      .filter(p => p.status === 'received' && p.received_date && p.received_date >= recvCutoffStr)
+      .sort((a, b) => (b.received_date || '').localeCompare(a.received_date || ''));
+
+    // Gabung jadi satu daftar: barang aktif (belum receive) di atas, sudah receive di bawah
+    const allRows = [...merged, ...receivedList];
+
     // Hitung berapa barang yang kena peringatan (sudah tiba > 7 hari belum receive)
     let warnCount = 0;
     arrived.forEach(p => {
       const d = daysSince(getArrivalRaw(p));
       if (d != null && d > 7) warnCount++;
     });
+    const metaTxt = `${allRows.length} PO · ${merged.length} belum receive · ${receivedList.length} sudah receive`;
     document.getElementById('meta-merged').textContent =
-      warnCount > 0 ? `${merged.length} PO · ⚠ ${warnCount} terlambat` : `${merged.length} PO`;
+      warnCount > 0 ? `${metaTxt} · ⚠ ${warnCount} terlambat` : metaTxt;
 
     const tbl = document.getElementById('tbl-merged');
-    tbl.innerHTML = merged.length === 0
-      ? '<tr><td colspan="6" class="empty">Tidak ada PO menunggu</td></tr>'
-      : merged.map(p => {
+    tbl.innerHTML = allRows.length === 0
+      ? '<tr><td colspan="7" class="empty">Belum ada data barang</td></tr>'
+      : allRows.map(p => {
+          const isRecv = p.status === 'received';
           const isArr = p.status === 'arrived';
-          const raw = getArrivalRaw(p);
-          const tgl = formatTanggal(raw);
-          const dur = daysSince(raw);
 
-          let dateLabel, durHtml = '', rowCls = '', warnTag = '';
-          if (isArr) {
-            // Barang sudah datang tapi belum di-receive
-            dateLabel = `<div class="date-main">📥 Datang: ${tgl}</div>`;
+          let dateCell, petugas, badge, rowCls = '', warnTag = '';
+
+          if (isRecv) {
+            // Sudah di-receive
+            dateCell = `<div class="date-main">✅ ${formatTanggal(p.received_date)}</div>`;
+            petugas = esc(p.received_by || '-');
+            badge = '<span class="status-badge sb-r">✅ Sudah Receive</span>';
+            rowCls = ' class="row-recv"';
+          } else if (isArr) {
+            // Sudah datang tapi belum di-receive
+            const raw = getArrivalRaw(p);
+            const dur = daysSince(raw);
+            dateCell = `<div class="date-main">📥 Datang: ${formatTanggal(raw)}</div>`;
             if (dur != null) {
               const teks = dur === 0 ? 'Hari ini' : `${dur} hari menunggu`;
               if (dur > 7) {
-                durHtml = `<div class="date-dur warn">⚠ ${teks}</div>`;
+                dateCell += `<div class="date-dur warn">⚠ ${teks}</div>`;
                 rowCls = ' class="row-warn"';
                 warnTag = '<span class="warn-tag">TERLAMBAT</span>';
               } else {
-                durHtml = `<div class="date-dur">${teks}</div>`;
+                dateCell += `<div class="date-dur">${teks}</div>`;
               }
             }
+            petugas = '<span style="color:#94a3b8;">Belum receive</span>';
+            badge = '<span class="status-badge sb-a">⚠ Sudah Tiba</span>';
           } else {
-            // Barang belum datang
-            dateLabel = `<div class="date-main">🚚 Input: ${tgl}</div>`;
-            if (dur != null && dur > 0) durHtml = `<div class="date-dur">${dur} hari lalu</div>`;
+            // Belum datang
+            const raw = getArrivalRaw(p);
+            const dur = daysSince(raw);
+            dateCell = `<div class="date-main">🚚 Input: ${formatTanggal(raw)}</div>`;
+            if (dur != null && dur > 0) dateCell += `<div class="date-dur">${dur} hari lalu</div>`;
+            petugas = '<span style="color:#94a3b8;">-</span>';
+            badge = '<span class="status-badge sb-p">🚚 Dalam Jalan</span>';
           }
 
           return `<tr${rowCls}>
@@ -457,8 +485,9 @@
             <td>${esc(p.supplier)}</td>
             <td class="right">${(p.koli || 0).toLocaleString('id-ID')}</td>
             <td class="right">${formatRp(p.amount)}</td>
-            <td class="date-cell">${dateLabel}${durHtml}</td>
-            <td class="right"><span class="status-badge ${isArr ? 'sb-a' : 'sb-p'}">${isArr ? '⚠ Sudah Tiba' : '🚚 Dalam Jalan'}</span></td>
+            <td class="date-cell">${dateCell}</td>
+            <td>${petugas}</td>
+            <td class="right">${badge}</td>
           </tr>`;
         }).join('');
   }
