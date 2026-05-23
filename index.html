@@ -138,7 +138,7 @@
   <div class="stats">
     <div class="stat b"><div class="stat-row"><div><div class="stat-l">Belum Sampai</div><div class="stat-v" id="s-pending">0</div><div class="stat-sub"><span id="s-pending-koli">0</span> koli · <span id="s-pending-nominal">Rp 0</span></div></div><div class="stat-icon">🚚</div></div></div>
     <div class="stat w"><div class="stat-row"><div><div class="stat-l">Belum Receive</div><div class="stat-v" id="s-arrived">0</div><div class="stat-sub"><span id="s-arrived-koli">0</span> koli · <span id="s-arrived-nominal">Rp 0</span></div></div><div class="stat-icon">⏰</div></div></div>
-    <div class="stat g"><div class="stat-row"><div><div class="stat-l">Sudah Receive Hari Ini</div><div class="stat-v" id="s-received">0</div><div class="stat-sub"><span id="s-received-koli">0</span> koli · <span id="s-received-nominal">Rp 0</span></div></div><div class="stat-icon">✅</div></div></div>
+    <div class="stat g"><div class="stat-row"><div><div class="stat-l">Sudah Receive</div><div class="stat-v" id="s-received">0</div><div class="stat-sub"><span id="s-received-koli">0</span> koli · <span id="s-received-nominal">Rp 0</span></div></div><div class="stat-icon">✅</div></div></div>
   </div>
 
   <div class="card">
@@ -351,9 +351,14 @@
 
   function renderDashboard() {
     const today = todayStr();
+    // Batas 6 bulan: barang di-receive dalam rentang ini tetap dihitung & ditampilkan
+    const recvCutoff = new Date();
+    recvCutoff.setMonth(recvCutoff.getMonth() - 6);
+    const recvCutoffStr = dateStr(recvCutoff);
+
     const pending = allPOs.filter(p => p.status === 'pending');
     const arrived = allPOs.filter(p => p.status === 'arrived');
-    const received = allPOs.filter(p => p.status === 'received' && p.received_date === today);
+    const received = allPOs.filter(p => p.status === 'received' && p.received_date && p.received_date >= recvCutoffStr);
 
     const sumKoli = arr => arr.reduce((s,p) => s + (p.koli||0), 0);
     const sumAmount = arr => arr.reduce((s,p) => s + (p.amount||0), 0);
@@ -370,7 +375,9 @@
 
     const staffStats = {};
     allStaff.forEach(s => { staffStats[s.name] = { count: 0, koli: 0, amount: 0, active: true }; });
-    received.forEach(p => {
+    // Performance tim TETAP dihitung per hari ini saja (reset tiap tengah malam)
+    const receivedToday = allPOs.filter(p => p.status === 'received' && p.received_date === today);
+    receivedToday.forEach(p => {
       const name = p.received_by || '(unknown)';
       if (!staffStats[name]) staffStats[name] = { count: 0, koli: 0, amount: 0, active: false };
       staffStats[name].count++;
@@ -417,12 +424,8 @@
     });
     const merged = [...arrivedSorted, ...pending];
 
-    // Barang sudah di-receive: tampil sampai 6 bulan setelah tanggal receive, lalu hilang
-    const recvCutoff = new Date();
-    recvCutoff.setMonth(recvCutoff.getMonth() - 6);
-    const recvCutoffStr = dateStr(recvCutoff);
-    const receivedList = allPOs
-      .filter(p => p.status === 'received' && p.received_date && p.received_date >= recvCutoffStr)
+    // Barang sudah di-receive (6 bulan terakhir, sudah dihitung di atas sbg 'received')
+    const receivedList = [...received]
       .sort((a, b) => (b.received_date || '').localeCompare(a.received_date || ''));
 
     // Gabung jadi satu daftar: barang aktif (belum receive) di atas, sudah receive di bawah
