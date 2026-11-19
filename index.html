@@ -180,8 +180,8 @@
   // ============================================
   // PASTE SUPABASE CONFIG DISINI
   // ============================================
-  const SUPABASE_URL = 'https://gpvahzvocznsftkreedc.supabase.co';
-  const SUPABASE_KEY = 'sb_publishable_Fij0uvdbPkVuMJOm1Sglbg_am-ChLgm';
+  const SUPABASE_URL = 'https://pjycynqlvhizggzxvewi.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_CGvAhDE_qf6sIeaJQU9ohg_YnkRhjnC';
   // ============================================
 
   if (SUPABASE_URL === 'PLACEHOLDER_URL') {
@@ -274,7 +274,9 @@
           datesToArchive.add(p.received_date);
         }
       });
+      const sudahDiarsip = new Set(allHistory.map(h => h.date));
       for (const date of datesToArchive) {
+        if (sudahDiarsip.has(date)) continue; // sudah ada di arsip, tidak perlu cek ke server
         // Check if archive already exists for this date
         const { data: existing } = await supabase.from('history').select('date').eq('date', date).maybeSingle();
         if (existing) continue;
@@ -320,9 +322,23 @@
   });
 
   // === LOAD DATA ===
+  // Ambil PO yang dipakai dashboard saja: yang belum selesai + yang di-receive 6 bulan terakhir.
+  // Diambil per 1000 baris (batas Supabase) supaya tidak ada yang kepotong.
+  async function ambilPOs() {
+    const batas = new Date(); batas.setMonth(batas.getMonth() - 6);
+    const hasil = [];
+    for (let dari = 0; ; dari += 1000) {
+      const { data, error } = await supabase.from('pos').select('*')
+        .or(`status.neq.received,received_date.gte.${dateStr(batas)}`)
+        .order('created_at', { ascending: false }).range(dari, dari + 999);
+      if (error) return { error };
+      hasil.push(...data);
+      if (data.length < 1000) return { data: hasil };
+    }
+  }
   async function loadAll() {
     const [pos, hist, staff] = await Promise.all([
-      supabase.from('pos').select('*').order('created_at', { ascending: false }),
+      ambilPOs(),
       supabase.from('history').select('*').order('date', { ascending: false }),
       supabase.from('staff').select('*').order('name')
     ]);
@@ -336,18 +352,36 @@
   }
 
   // === REAL-TIME SUBSCRIPTIONS ===
+  // Hemat kuota: perubahan PO langsung dipasang ke data yang sudah ada (tidak ambil ulang semuanya)
+  let jedaGambar = null;
+  function gambarUlang() {
+    clearTimeout(jedaGambar);
+    jedaGambar = setTimeout(() => { renderDashboard(); renderRanking(); renderHistory(); }, 300);
+  }
+  let jedaMuat = null;
+  const muatNanti = () => { clearTimeout(jedaMuat); jedaMuat = setTimeout(loadAll, 2000); };
   supabase.channel('pos-changes')
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'pos' }, () => loadAll())
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'pos' }, (ev) => {
+      if (ev.eventType === 'DELETE') allPOs = allPOs.filter(p => p.id !== ev.old.id);
+      else if (ev.new && ev.new.id) {
+        const i = allPOs.findIndex(p => p.id === ev.new.id);
+        if (i >= 0) allPOs[i] = ev.new; else allPOs.unshift(ev.new);
+      }
+      gambarUlang();
+    })
     .subscribe();
   supabase.channel('history-changes')
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'history' }, () => loadAll())
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'history' }, muatNanti)
     .subscribe();
   supabase.channel('staff-changes')
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'staff' }, () => loadAll())
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'staff' }, muatNanti)
     .subscribe();
 
   loadAll();
-  setInterval(loadAll, 30000); // Backup refresh every 30s
+  // Cadangan kalau realtime putus: ambil ulang tiap 10 menit (hanya saat halaman sedang dibuka),
+  // dan langsung saat tab dibuka lagi
+  setInterval(() => { if (!document.hidden) loadAll(); }, 600000);
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) loadAll(); });
 
   function renderDashboard() {
     const today = todayStr();
