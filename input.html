@@ -151,8 +151,8 @@
   // ============================================
   // PASTE SUPABASE CONFIG DISINI (sama persis kayak index.html)
   // ============================================
-  const SUPABASE_URL = 'https://gpvahzvocznsftkreedc.supabase.co';
-  const SUPABASE_KEY = 'sb_publishable_Fij0uvdbPkVuMJOm1Sglbg_am-ChLgm';
+  const SUPABASE_URL = 'https://pjycynqlvhizggzxvewi.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_CGvAhDE_qf6sIeaJQU9ohg_YnkRhjnC';
   // ============================================
 
   const configMissing = SUPABASE_URL === 'PLACEHOLDER_URL';
@@ -318,6 +318,10 @@
     document.getElementById('btn-save').disabled = true;
     document.getElementById('btn-save').textContent = '⏳ Menyimpan...';
     try {
+      // cek juga PO yang sudah selesai (tidak dimuat di halaman ini)
+      const { data: sudahAda, error: errCek } = await supabase.from('pos').select('id').ilike('po_number', po.replace(/[\\%_]/g, '\\$&')).limit(1);
+      if (errCek) throw errCek;
+      if (sudahAda && sudahAda.length) throw new Error(`PO "${po}" sudah ada!`);
       const { error } = await supabase.from('pos').insert({
         po_number: po, supplier: supplier, koli: koli, amount: amount,
         status: 'pending', created_by: currentUser
@@ -382,7 +386,8 @@
   };
 
   async function loadPOs() {
-    const { data, error } = await supabase.from('pos').select('*').order('created_at', { ascending: false });
+    // halaman Input cuma butuh PO yang belum selesai (dipesan / sudah datang)
+    const { data, error } = await supabase.from('pos').select('*').in('status', ['pending', 'arrived']).order('created_at', { ascending: false }).limit(1000);
     if (error) { console.error(error); return; }
     allPOs = data || [];
     renderTables();
@@ -390,8 +395,12 @@
 
   function startApp() {
     loadPOs();
-    supabase.channel('input-pos').on('postgres_changes', { event: '*', schema: 'public', table: 'pos' }, () => loadPOs()).subscribe();
-    setInterval(loadPOs, 15000);
+    let jeda = null;
+    const muatNanti = () => { clearTimeout(jeda); jeda = setTimeout(loadPOs, 1000); };
+    supabase.channel('input-pos').on('postgres_changes', { event: '*', schema: 'public', table: 'pos' }, muatNanti).subscribe();
+    // cadangan kalau realtime putus: tiap 5 menit saat halaman dibuka, dan saat tab dibuka lagi
+    setInterval(() => { if (!document.hidden) loadPOs(); }, 300000);
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) loadPOs(); });
   }
 
   function renderTables() {
